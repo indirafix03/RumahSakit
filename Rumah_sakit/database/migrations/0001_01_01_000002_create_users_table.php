@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+        public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
@@ -17,32 +17,20 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->enum('role',['admin', 'dokter', 'pasien'])->default('pasien');
-            $table->foreignId('poli-id')->nullable()->constrained('polis')->onDelete('set null');
+            $table->enum('role', ['admin', 'dokter', 'pasien'])->default('pasien');
+            $table->foreignId('poli_id')->nullable()->constrained('polis')->onDelete('set null');
             $table->string('no_telepon')->nullable();
             $table->text('alamat')->nullable();
             $table->string('spesialisasi')->nullable();
             $table->text('bio')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void{
-        Schema::table('users', function (Blueprint $table){
-              $table->dropColumn(['role', 'poli_id', 'no_telepon', 'alamat', 'spesialisasi', 'bio']);
-        });
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
     }
+
 };
