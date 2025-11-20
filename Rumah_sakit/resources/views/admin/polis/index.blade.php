@@ -21,12 +21,12 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100">
                 <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
-                    @if(!empty($poli->ikon) && Storage::disk('public')->exists($poli->ikon))
-                        <img src="{{ Storage::url($poli->ikon) }}" 
-                             alt="{{ $poli->nama_poli }}"
-                             class="img-fluid"
-                             style="max-height: 100%; max-width: 100%; object-fit: cover;"
-                             onerror="this.src='https://via.placeholder.com/300x200/EFEFEF/666666?text=Image+Error'">
+                    @if($poli->has_image && $poli->image_url)
+                        <img src="{{ $poli->image_url }}" 
+                            alt="{{ $poli->nama_poli }}"
+                            class="img-fluid"
+                            style="max-height: 100%; max-width: 100%; object-fit: cover;"
+                            onerror="this.src='https://via.placeholder.com/300x200/EFEFEF/666666?text=Image+Error'">
                     @else
                         <div class="text-center text-muted">
                             <i class="fas fa-hospital fa-3x mb-2"></i>
@@ -41,7 +41,7 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ $poli->nama_poli }}</h5>
-                    <p class="card-text">{{ Str::limit($poli->deskripsi, 100) }}</p>
+                    <p class="card-text">{{ \Illuminate\Support\Str::limit($poli->deskripsi, 100) }}</p>
                     @if(!empty($poli->ikon))
                         <small class="text-muted">Path: {{ $poli->ikon }}</small>
                     @endif

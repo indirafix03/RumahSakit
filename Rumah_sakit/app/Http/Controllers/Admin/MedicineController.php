@@ -37,7 +37,7 @@ class MedicineController extends Controller
             'deskripsi' => $request->deskripsi,
             'tipe_obat' => $request->tipe_obat,
             'stok' => $request->stok,
-            'gambar' => $path,
+            'gambar_obat' => $path,
         ]);
 
         return redirect()->route('admin.medicines.index')->with('success', 'Obat berhasil dibuat.');
@@ -66,13 +66,14 @@ class MedicineController extends Controller
         ];
 
         if ($request->hasFile('gambar')) {
-            // Delete old image
-            if ($medicine->gambar) {
-                Storage::disk('public')->delete($medicine->gambar);
+        // Hapus file lama jika ada dan benar-benar ada di disk
+            if (!empty($medicine->gambar_obat) && \Illuminate\Support\Facades\Storage::disk('public')->exists($medicine->gambar_obat)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($medicine->gambar_obat);
             }
-            $data['gambar'] = $request->file('gambar')->store('medicines', 'public');
-        }
 
+            // Simpan file baru ke folder 'medicines' di disk 'public' dan set ke kolom DB yang benar
+            $data['gambar_obat'] = $request->file('gambar')->store('medicines', 'public');
+        }
         $medicine->update($data);
 
         return redirect()->route('admin.medicines.index')->with('success', 'Obat berhasil diperbarui.');
@@ -80,8 +81,8 @@ class MedicineController extends Controller
 
     public function destroy(Medicine $medicine)
     {
-        if ($medicine->gambar) {
-            Storage::disk('public')->delete($medicine->gambar);
+        if ($medicine->gambar_obat) {
+            Storage::disk('public')->delete($medicine->gambar_obat);
         }
         $medicine->delete();
         return redirect()->route('admin.medicines.index')->with('success', 'Obat berhasil dihapus.');

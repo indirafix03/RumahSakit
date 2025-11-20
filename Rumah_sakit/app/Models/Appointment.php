@@ -4,95 +4,72 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Appointment extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'pasien_id', 'dokter_id', 'schedule_id', 'tanggal_booking', 
-        'keluhan_singkat', 'status', 'alasan_reject'
+        'pasien_id',
+        'dokter_id',
+        'schedule_id',
+        'tanggal_booking',
+        'keluhan_singkat',
+        'status',
+        'alasan_reject',
     ];
 
     protected $casts = [
         'tanggal_booking' => 'date',
     ];
 
-    // Appointment belongs to Patient (User)
-    public function patient()
+
+    // Relationships
+    public function pasien()
     {
         return $this->belongsTo(User::class, 'pasien_id');
     }
 
-    // Appointment belongs to Doctor (User)
-    public function doctor()
+    public function dokter()
     {
         return $this->belongsTo(User::class, 'dokter_id');
     }
 
-    // Appointment belongs to Schedule
     public function schedule()
     {
-        return $this->belongsTo(Schedule::class);
+        return $this->belongsTo(Schedule::class, 'schedule_id');
     }
 
-    // Appointment has one MedicalRecord
     public function medicalRecord()
     {
         return $this->hasOne(MedicalRecord::class);
     }
 
-    // Appointment has one Feedback
-    public function feedback()
+    // Accessor untuk kompatibilitas
+    public function getJamAttribute()
     {
-        return $this->hasOne(Feedback::class);
+        return $this->schedule ? $this->schedule->jam_mulai : null;
     }
 
-    // Scopes untuk status
-    public function scopePending($query)
+     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', 'pending');
     }
 
-    public function scopeApproved($query)
+    /**
+     * Scope untuk appointments dengan status approved
+     */
+    public function scopeApproved(Builder $query): Builder
     {
         return $query->where('status', 'approved');
     }
 
-    public function scopeRejected($query)
+    /**
+     * Scope untuk appointments dokter tertentu
+     */
+    public function scopeForDokter(Builder $query, $dokterId): Builder
     {
-        return $query->where('status', 'rejected');
-    }
-
-    public function scopeSelesai($query)
-    {
-        return $query->where('status', 'selesai');
-    }
-
-    // Scope untuk janji hari ini
-    public function scopeHariIni($query)
-    {
-        return $query->where('tanggal_booking', today());
-    }
-
-    // Method untuk approve appointment
-    public function approve()
-    {
-        $this->update(['status' => 'approved']);
-    }
-
-    // Method untuk reject appointment
-    public function reject($alasan = null)
-    {
-        $this->update([
-            'status' => 'rejected',
-            'alasan_reject' => $alasan
-        ]);
-    }
-
-    // Method untuk complete appointment
-    public function complete()
-    {
-        $this->update(['status' => 'selesai']);
+        return $query->where('dokter_id', $dokterId);
     }
 }

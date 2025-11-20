@@ -11,7 +11,19 @@ class PoliController extends Controller
 {
     public function index()
     {
-        $polis = Poli::latest()->get();
+        $polis = Poli::latest()->get()->map(function($poli) {
+            // default null
+            $poli->image_url = null;
+            $poli->has_image = false;
+
+            if (!empty($poli->ikon) && Storage::disk('public')->exists($poli->ikon)) {
+                $poli->image_url = Storage::url($poli->ikon); 
+                $poli->has_image = true;
+            }
+
+            return $poli;
+        });
+
         return view('admin.polis.index', compact('polis'));
     }
 
@@ -58,21 +70,18 @@ class PoliController extends Controller
         ];
 
         if ($request->hasFile('ikon')) {
-            // Delete old image
-            if ($poli->ikon) {
+            if ($poli->ikon && Storage::disk('public')->exists($poli->ikon)) {
                 Storage::disk('public')->delete($poli->ikon);
             }
             $data['ikon'] = $request->file('ikon')->store('polis', 'public');
         }
-
         $poli->update($data);
-
         return redirect()->route('admin.polis.index')->with('success', 'Poli berhasil diperbarui.');
     }
 
     public function destroy(Poli $poli)
     {
-        if ($poli->ikon) {
+        if ($poli->ikon && Storage::disk('public')->exists($poli->ikon)) {
             Storage::disk('public')->delete($poli->ikon);
         }
         $poli->delete();

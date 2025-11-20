@@ -57,31 +57,31 @@
 
 <script>
 // Preview image sebelum upload
+<script>
 document.getElementById('ikon').addEventListener('change', function(e) {
     const file = e.target.files[0];
-    const preview = document.getElementById('image-preview');
-    
-    if (!preview) {
-        // Create preview container if not exists
-        const previewContainer = document.createElement('div');
-        previewContainer.id = 'image-preview';
-        previewContainer.className = 'mt-3';
-        previewContainer.innerHTML = '<label class="form-label">Preview:</label><div class="border p-2 text-center"></div>';
-        this.parentNode.appendChild(previewContainer);
-        preview = previewContainer.querySelector('div');
-    } else {
-        preview = document.querySelector('#image-preview div');
-    }
-    
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.innerHTML = `<img src="${e.target.result}" class="img-fluid" style="max-height: 200px;">`;
+        // cari container preview, buat jika belum ada
+    let previewWrapper = document.getElementById('image-preview-wrapper');
+        if (!previewWrapper) {
+            previewWrapper = document.createElement('div');
+            previewWrapper.id = 'image-preview-wrapper';
+            previewWrapper.className = 'mt-3';
+            // tempat untuk menaruh gambar
+            previewWrapper.innerHTML = '<label class="form-label">Preview:</label><div id="image-preview" class="border p-2 text-center"></div>';
+            this.parentNode.appendChild(previewWrapper);
         }
-        reader.readAsDataURL(file);
-    } else {
-        preview.innerHTML = '<p class="text-muted">No image selected</p>';
-    }
-});
+
+        const preview = document.getElementById('image-preview');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                preview.innerHTML = `<img src="${ev.target.result}" class="img-fluid" style="max-height: 200px;">`;
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '<p class="text-muted">No image selected</p>';
+        }
+    });
 </script>
 @endsection

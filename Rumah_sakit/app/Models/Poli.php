@@ -4,12 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\Appointment;
+use App\Models\Schedule;
 
 class Poli extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama_poli', 'deskripsi', 'ikon_gambar'];
+    protected $fillable = ['nama_poli', 'deskripsi', 'ikon'];
 
     // Poli has many Doctors (users dengan role dokter)
     public function doctors()
