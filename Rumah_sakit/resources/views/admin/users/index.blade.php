@@ -142,7 +142,7 @@
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th width="50" class="ps-4">#</th>
+                                <th width="50" class="ps-4">NO</th>
                                 <th>Nama</th>
                                 <th>Email</th>
                                 <th>Role</th>

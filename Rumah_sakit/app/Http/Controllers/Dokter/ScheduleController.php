@@ -35,7 +35,7 @@ class ScheduleController extends Controller
         $request->validate([
             'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'jam_mulai' => 'required|date_format:H:i',
-            'durasi' => 'required|in:30',
+            'durasi' => 'required|in:30,45,60',
         ]);
 
         $user = Auth::user();
@@ -86,7 +86,7 @@ class ScheduleController extends Controller
         $request->validate([
             'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'jam_mulai' => 'required|date_format:H:i',
-            'durasi' => 'required|in:30',
+            'durasi' => 'required|in:30,45,60',
         ]);
 
         $user = Auth::user();

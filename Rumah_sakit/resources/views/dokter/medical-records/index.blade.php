@@ -29,7 +29,7 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>NO</th>
                             <th>Pasien</th>
                             <th>Tanggal</th>
                             <th>Diagnosis</th>

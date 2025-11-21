@@ -12,7 +12,7 @@
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
@@ -22,13 +22,13 @@
                 <table class="table table-striped align-middle">
                     <thead>
                         <tr>
-                            <th style="width: 50px;">#</th>
-                            <th style="width: 70px;">Gambar</th>
+                            <th>No</th>
+                            <th>Gambar</th>
                             <th>Nama Obat</th>
-                            <th>Tipe Obat</th>
+                            <th>Tipe</th>
                             <th>Stok</th>
                             <th>Deskripsi</th>
-                            <th style="width: 140px;">Aksi</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -36,13 +36,13 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>
-                                @if(!empty($medicine->gambar_obat) && \Illuminate\Support\Facades\Storage::disk('public')->exists($medicine->gambar_obat))
-                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($medicine->gambar_obat) }}" 
-                                         alt="{{ $medicine->nama_obat }}" 
-                                         style="width: 50px; height: 50px; object-fit: cover;" class="rounded">
+                                @if($medicine->gambar_obat && Storage::disk('public')->exists($medicine->gambar_obat))
+                                    <img src="{{ Storage::url($medicine->gambar_obat) }}" 
+                                         class="rounded"
+                                         style="width:50px;height:50px;object-fit:cover">
                                 @else
-                                    <div class="bg-light d-flex align-items-center justify-content-center rounded" 
-                                         style="width:50px; height:50px;">
+                                    <div class="bg-light d-flex align-items-center justify-content-center rounded"
+                                         style="width:50px;height:50px;">
                                         <i class="fas fa-pills text-muted"></i>
                                     </div>
                                 @endif
@@ -58,32 +58,37 @@
                                     {{ $medicine->stok }}
                                 </span>
                             </td>
-                            <td>{{ \Illuminate\Support\Str::limit($medicine->deskripsi ?? '-', 50) }}</td>
-                            <td class="text-nowrap">
-                            <td class="text-nowrap">
-                                <div class="dropdown">
-                                    <ul class="dropdown-menu" aria-labelledby="actionsDropdown{{ $medicine->id }}">
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('admin.medicines.edit', $medicine) }}">
-                                                <i class="fas fa-edit me-2"></i> Edit
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <form action="{{ route('admin.medicines.destroy', $medicine) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus {{ addslashes($medicine->nama_obat) }}?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="dropdown-item text-danger" type="submit">
-                                                    <i class="fas fa-trash me-2"></i> Hapus
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
+                            <td>{{ $medicine->deskripsi ?? '-' }}</td>
+
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    
+                                    <!-- tombol edit -->
+                                    <a href="{{ route('admin.medicines.edit', $medicine) }}" 
+                                       class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <!-- tombol delete -->
+                                    <form action="{{ route('admin.medicines.destroy', $medicine) }}" 
+                                          method="POST" 
+                                          onsubmit="return confirm('Hapus obat {{ $medicine->nama_obat }}?')">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+
                                 </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted">Belum ada data obat.</td>
+                            <td colspan="7" class="text-center text-muted py-3">
+                                Belum ada data obat.
+                            </td>
                         </tr>
                         @endforelse
                     </tbody>

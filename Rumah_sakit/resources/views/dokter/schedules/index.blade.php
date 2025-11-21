@@ -108,7 +108,10 @@
                         <label for="durasi" class="form-label">Durasi</label>
                         <select class="form-control" id="durasi" name="durasi" required>
                             <option value="30" selected>30 menit</option>
+                            <option value="45">45 menit</option>
+                            <option value="60">60 menit</option>
                         </select>
+
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -150,6 +153,8 @@
                         <label for="edit_durasi" class="form-label">Durasi</label>
                         <select class="form-control" id="edit_durasi" name="durasi" required>
                             <option value="30">30 menit</option>
+                            <option value="45">45 menit</option>
+                            <option value="60">60 menit</option>
                         </select>
                     </div>
                 </div>

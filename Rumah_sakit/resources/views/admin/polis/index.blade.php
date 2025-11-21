@@ -42,9 +42,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ $poli->nama_poli }}</h5>
                     <p class="card-text">{{ \Illuminate\Support\Str::limit($poli->deskripsi, 100) }}</p>
-                    @if(!empty($poli->ikon))
-                        <small class="text-muted">Path: {{ $poli->ikon }}</small>
-                    @endif
+                    
                 </div>
                 <div class="card-footer">
                     <div class="d-flex justify-content-between">
