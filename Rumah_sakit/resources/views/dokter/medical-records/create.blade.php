@@ -26,17 +26,16 @@
                                     id="appointment_id" name="appointment_id" required>
                                 <option value="">-- Pilih Janji Temu --</option>
                                 @foreach($todayAppointments as $appointment)
-                                    <option value="{{ $appointment->id }}" 
-                                        {{ old('appointment_id') == $appointment->id ? 'selected' : '' }}>
-                                        {{ $appointment->pasien->name }} - 
-                                        {{ $appointment->tanggal->format('d/m/Y') }} {{ $appointment->jam }}
+                                    <option value="{{ $appointment['id'] }}" 
+                                        {{ old('appointment_id') == $appointment['id'] ? 'selected' : '' }}>
+                                        {{ $appointment['display_text'] }}
                                     </option>
                                 @endforeach
                             </select>
                             @error('appointment_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            @if($todayAppointments->isEmpty())
+                            @if(count($todayAppointments) === 0)
                                 <div class="alert alert-warning mt-2">
                                     <i class="fas fa-info-circle me-2"></i>
                                     Tidak ada janji temu yang disetujui untuk hari ini.
@@ -190,15 +189,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const patientInfo = document.getElementById('patient-info');
     let itemCount = 1;
 
-    // Data janji temu untuk info pasien - SESUAIKAN DENGAN STRUKTUR TABEL
+    // Data janji temu untuk info pasien - SESUAIKAN DENGAN STRUKTUR BARU
     const appointmentsData = {
         @foreach($todayAppointments as $appointment)
-        "{{ $appointment->id }}": {
-            patientName: "{{ $appointment->pasien->name }}",
-            patientEmail: "{{ $appointment->pasien->email }}",
-            appointmentDate: "{{ $appointment->tanggal_booking->format('d/m/Y') }}", // menggunakan tanggal_booking
-            scheduleTime: "{{ $appointment->schedule ? $appointment->schedule->jam_mulai : 'N/A' }}", // dari schedule
-            keluhan: "{{ $appointment->keluhan_singkat }}" // menggunakan keluhan_singkat
+        "{{ $appointment['id'] }}": {
+            patientName: "{{ $appointment['pasien']['name'] }}",
+            patientEmail: "{{ $appointment['pasien']['email'] }}",
+            appointmentDate: "{{ $appointment['tanggal_booking']->format('d/m/Y') }}",
+            scheduleTime: "{{ $appointment['schedule'] ? $appointment['schedule']->jam_mulai : 'N/A' }}",
+            keluhan: "{{ $appointment['keluhan_singkat'] }}"
         },
         @endforeach
     };

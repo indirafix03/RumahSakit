@@ -57,7 +57,8 @@
                                 @foreach($pendingAppointments as $appointment)
                                 <tr>
                                     <td>{{ $appointment->pasien->name }}</td>
-                                    <td>{{ $appointment->tanggal->format('d/m/Y') }}</td>
+                                    {{-- Menggunakan tanggal_booking sesuai dengan casting di Model Appointment --}}
+                                    <td>{{ $appointment->tanggal_booking?->format('d/m/Y') ?? 'T/A' }}</td>
                                     <td>{{ $appointment->jam }}</td>
                                     <td>{{ Str::limit($appointment->keluhan, 50) }}</td>
                                     <td>
@@ -105,7 +106,8 @@
                                 @foreach($approvedAppointments as $appointment)
                                 <tr>
                                     <td>{{ $appointment->pasien->name }}</td>
-                                    <td>{{ $appointment->tanggal->format('d/m/Y') }}</td>
+                                    {{-- Menggunakan tanggal_booking sesuai dengan casting di Model Appointment --}}
+                                    <td>{{ $appointment->tanggal_booking?->format('d/m/Y') ?? 'T/A' }}</td>
                                     <td>{{ $appointment->jam }}</td>
                                     <td>{{ Str::limit($appointment->keluhan, 50) }}</td>
                                 </tr>
@@ -138,7 +140,8 @@
                                 @foreach($rejectedAppointments as $appointment)
                                 <tr>
                                     <td>{{ $appointment->pasien->name }}</td>
-                                    <td>{{ $appointment->tanggal->format('d/m/Y') }}</td>
+                                    {{-- Menggunakan tanggal_booking sesuai dengan casting di Model Appointment --}}
+                                    <td>{{ $appointment->tanggal_booking?->format('d/m/Y') ?? 'T/A' }}</td>
                                     <td>{{ $appointment->alasan_penolakan }}</td>
                                 </tr>
                                 @endforeach
@@ -170,7 +173,8 @@
                                 @foreach($completedAppointments as $appointment)
                                 <tr>
                                     <td>{{ $appointment->pasien->name }}</td>
-                                    <td>{{ $appointment->tanggal->format('d/m/Y') }}</td>
+                                    {{-- Menggunakan tanggal_booking sesuai dengan casting di Model Appointment --}}
+                                    <td>{{ $appointment->tanggal_booking?->format('d/m/Y') ?? 'T/A' }}</td>
                                     <td>{{ $appointment->medicalRecord ? Str::limit($appointment->medicalRecord->diagnosis, 50) : '-' }}</td>
                                 </tr>
                                 @endforeach

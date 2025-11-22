@@ -43,33 +43,34 @@ class Appointment extends Model
 
     public function medicalRecord()
     {
+        // Relasi dengan Rekam Medis (one-to-one)
         return $this->hasOne(MedicalRecord::class);
     }
 
-    // Accessor untuk kompatibilitas
+    // Accessor untuk mendapatkan jam dari schedule
     public function getJamAttribute()
     {
         return $this->schedule ? $this->schedule->jam_mulai : null;
     }
 
-     public function scopePending(Builder $query): Builder
+    // Scopes
+    public function scopePending(Builder $query): Builder
     {
         return $query->where('status', 'pending');
     }
 
-    /**
-     * Scope untuk appointments dengan status approved
-     */
     public function scopeApproved(Builder $query): Builder
     {
         return $query->where('status', 'approved');
     }
 
-    /**
-     * Scope untuk appointments dokter tertentu
-     */
     public function scopeForDokter(Builder $query, $dokterId): Builder
     {
         return $query->where('dokter_id', $dokterId);
+    }
+
+    public function poli()
+    {
+    return $this->belongsTo(Poli::class, 'poli_id');
     }
 }

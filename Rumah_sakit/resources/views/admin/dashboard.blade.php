@@ -49,8 +49,8 @@
             @if($pendingAppointments->count() > 0)
                 @foreach($pendingAppointments as $appointment)
                     <div class="border p-4 mb-2 rounded">
-                        <p><strong>Patient:</strong> {{ $appointment->patient->name }}</p>
-                        <p><strong>Dokter:</strong> {{ $appointment->doctor->name }}</p>
+                        <p><strong>Patient:</strong> {{ $appointment->pasien->name }}</p>
+                        <p><strong>Dokter:</strong> {{ $appointment->dokter->name }}</p>
                         <p><strong>Keluhan:</strong> {{ $appointment->keluhan_singkat }}</p>
                     </div>
                 @endforeach

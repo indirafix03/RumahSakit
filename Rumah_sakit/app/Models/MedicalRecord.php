@@ -9,7 +9,15 @@ class MedicalRecord extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['appointment_id', 'diagnosis', 'tindakan_medis', 'catatan'];
+    // TAMBAHKAN dokter_id dan pasien_id ke fillable
+    protected $fillable = [
+        'appointment_id', 
+        'dokter_id', 
+        'pasien_id', 
+        'diagnosis', 
+        'tindakan_medis', 
+        'catatan'
+    ];
 
     // MedicalRecord belongs to Appointment
     public function appointment()
@@ -26,12 +34,27 @@ class MedicalRecord extends Model
     // Accessor untuk mendapatkan data pasien melalui appointment
     public function getPatientAttribute()
     {
-        return $this->appointment->patient;
+        return $this->appointment->pasien; // SESUAIKAN: gunakan 'pasien' bukan 'patient'
     }
 
     // Accessor untuk mendapatkan data dokter melalui appointment
     public function getDoctorAttribute()
     {
-        return $this->appointment->doctor;
+        return $this->appointment->dokter; // SESUAIKAN: gunakan 'dokter' bukan 'doctor'
+    }
+
+    public function prescriptions()
+    {
+        return $this->hasMany(Prescription::class);
+    }
+
+    public function dokter()
+    {
+        return $this->belongsTo(User::class, 'dokter_id');
+    }
+
+    public function pasien()
+    {
+        return $this->belongsTo(User::class, 'pasien_id');
     }
 }
