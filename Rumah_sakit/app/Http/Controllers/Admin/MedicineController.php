@@ -9,10 +9,28 @@ use Illuminate\Support\Facades\Storage;
 
 class MedicineController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $medicines = Medicine::latest()->get();
-        return view('admin.medicines.index', compact('medicines'));
+        // Ambil parameter dari request
+        $search = $request->input('search');
+        $status = $request->input('status');
+        $type = $request->input('type');
+
+        // Query dengan filter
+        $medicines = Medicine::query()
+            ->when($search, function($query) use ($search) {
+                return $query->search($search);
+            })
+            ->when($status, function($query) use ($status) {
+                return $query->byStatus($status);
+            })
+            ->when($type, function($query) use ($type) {
+                return $query->byType($type);
+            })
+            ->latest()
+            ->get();
+
+        return view('admin.medicines.index', compact('medicines', 'search', 'status', 'type'));
     }
 
     public function create()
@@ -27,6 +45,7 @@ class MedicineController extends Controller
             'deskripsi' => 'required|string',
             'tipe_obat' => 'required|in:keras,biasa',
             'stok' => 'required|integer|min:0',
+            'expired_date' => 'nullable|date|after:today', // TAMBAHKAN
             'gambar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -37,6 +56,7 @@ class MedicineController extends Controller
             'deskripsi' => $request->deskripsi,
             'tipe_obat' => $request->tipe_obat,
             'stok' => $request->stok,
+            'expired_date' => $request->expired_date, // TAMBAHKAN
             'gambar_obat' => $path,
         ]);
 
@@ -55,6 +75,7 @@ class MedicineController extends Controller
             'deskripsi' => 'required|string',
             'tipe_obat' => 'required|in:keras,biasa',
             'stok' => 'required|integer|min:0',
+            'expired_date' => 'nullable|date', // TAMBAHKAN
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -63,17 +84,19 @@ class MedicineController extends Controller
             'deskripsi' => $request->deskripsi,
             'tipe_obat' => $request->tipe_obat,
             'stok' => $request->stok,
+            'expired_date' => $request->expired_date, // TAMBAHKAN
         ];
 
         if ($request->hasFile('gambar')) {
-        // Hapus file lama jika ada dan benar-benar ada di disk
-            if (!empty($medicine->gambar_obat) && \Illuminate\Support\Facades\Storage::disk('public')->exists($medicine->gambar_obat)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($medicine->gambar_obat);
+            // Hapus file lama jika ada dan benar-benar ada di disk
+            if (!empty($medicine->gambar_obat) && Storage::disk('public')->exists($medicine->gambar_obat)) {
+                Storage::disk('public')->delete($medicine->gambar_obat);
             }
 
-            // Simpan file baru ke folder 'medicines' di disk 'public' dan set ke kolom DB yang benar
+            // Simpan file baru ke folder 'medicines' di disk 'public'
             $data['gambar_obat'] = $request->file('gambar')->store('medicines', 'public');
         }
+
         $medicine->update($data);
 
         return redirect()->route('admin.medicines.index')->with('success', 'Obat berhasil diperbarui.');

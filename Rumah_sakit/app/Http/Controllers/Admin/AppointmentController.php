@@ -47,7 +47,16 @@ class AppointmentController extends Controller
 
     public function show(Appointment $appointment)
     {
-        $appointment->load(['pasien', 'dokter', 'dokter.poli', 'schedule', 'medicalRecord']);
+        // Load relationships dengan prescriptions
+        $appointment->load([
+            'pasien', 
+            'dokter', 
+            'dokter.poli', 
+            'schedule', 
+            'medicalRecord',
+            'medicalRecord.prescriptions',
+            'medicalRecord.prescriptions.medicine' // relationship ke model Medicine
+        ]);
         
         return view('admin.appointments.show', compact('appointment'));
     }

@@ -58,12 +58,17 @@ Route::middleware(['auth', 'verified', 'admin'])
     Route::put('/appointments/{appointment}/status', [$adminAppointmentController, 'updateStatus'])->name('appointments.updateStatus');
     Route::delete('/appointments/{appointment}', [$adminAppointmentController, 'destroy'])->name('appointments.destroy');
     Route::get('/appointments-statistics', [$adminAppointmentController, 'statistics'])->name('appointments.statistics');
+
+    // TAMBAHKAN Medical Records untuk Admin
+    $adminMedicalRecordController = App\Http\Controllers\Admin\MedicalRecordController::class;
+    Route::resource('medical-records', $adminMedicalRecordController);
+    Route::get('/medical-records/create/{appointment_id}', [$adminMedicalRecordController, 'create'])->name('medical-records.create');
 });
 
 // Dokter Routes
 Route::middleware(['auth', 'verified', 'dokter'])->prefix('dokter')->name('dokter.')->group(function () {
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [App\Http\Controllers\Dokter\DashboardController::class, 'index'])->name('dashboard');
     
     // Schedules (Consolidated to resource for brevity)
     Route::resource('schedules', ScheduleController::class)->except(['show', 'create', 'edit']); 

@@ -74,17 +74,29 @@
                         </div>
                     </div>
                 </div>
-                <!-- Button -->
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Simpan
-                    </button>
-                    <a href="{{ route('admin.medicines.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Batal
-                    </a>
-                </div>
-
-            </form>
+                <div class="mb-3">
+                    <label for="expired_date" class="form-label">Tanggal Kadaluarsa</label>
+                    <input type="date" 
+                    class="form-control @error('expired_date') is-invalid @enderror" 
+                        id="expired_date" 
+                        name="expired_date" 
+                        value="{{ old('expired_date', isset($medicine) ? $medicine->expired_date?->format('Y-m-d') : '') }}"
+                        min="{{ date('Y-m-d') }}">
+                        <div class="form-text">Kosongkan jika tidak ada tanggal kadaluarsa</div>
+                        @error('expired_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <!-- Button -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                        <a href="{{ route('admin.medicines.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Batal
+                        </a>
+                    </div>
+                </form>
         </div>
     </div>
 </div>

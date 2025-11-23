@@ -33,15 +33,15 @@
                             <table class="table table-borderless">
                                 <tr>
                                     <th width="40%">Pasien</th>
-                                    <td>{{ $appointment->pasien->name }}</td>
+                                    <td>{{ $appointment->pasien->name ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Email Pasien</th>
-                                    <td>{{ $appointment->pasien->email }}</td>
+                                    <td>{{ $appointment->pasien->email ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Dokter</th>
-                                    <td>Dr. {{ $appointment->dokter->name }}</td>
+                                    <td>Dr. {{ $appointment->dokter->name ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Poli</th>
@@ -53,12 +53,12 @@
                             <table class="table table-borderless">
                                 <tr>
                                     <th width="40%">Tanggal</th>
-                                    <td>{{ $appointment->tanggal_booking->format('d/m/Y') }}</td>
+                                    <td>{{ $appointment->tanggal_booking->format('d/m/Y') ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Waktu</th>
                                     <td>
-                                        @if($appointment->schedule)
+                                        @if(isset($appointment->schedule) && $appointment->schedule->jam_mulai)
                                             {{ \Carbon\Carbon::parse($appointment->schedule->jam_mulai)->format('H:i') }}
                                         @else
                                             N/A
@@ -93,7 +93,7 @@
                     <div class="mt-4">
                         <h6>Keluhan Pasien</h6>
                         <div class="border rounded p-3 bg-light">
-                            {{ $appointment->keluhan_singkat }}
+                            {{ $appointment->keluhan_singkat ?? 'Tidak ada keluhan' }}
                         </div>
                     </div>
 
@@ -121,13 +121,13 @@
                             <table class="table table-borderless">
                                 <tr>
                                     <th width="30%">Diagnosis</th>
-                                    <td>{{ $appointment->medicalRecord->diagnosis }}</td>
+                                    <td>{{ $appointment->medicalRecord->diagnosis ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Tindakan Medis</th>
-                                    <td>{{ $appointment->medicalRecord->tindakan_medis }}</td>
+                                    <td>{{ $appointment->medicalRecord->tindakan_medis ?? 'N/A' }}</td>
                                 </tr>
-                                @if($appointment->medicalRecord->catatan)
+                                @if($appointment->medicalRecord->catatan ?? false)
                                 <tr>
                                     <th>Catatan</th>
                                     <td>{{ $appointment->medicalRecord->catatan }}</td>
@@ -135,14 +135,20 @@
                                 @endif
                                 <tr>
                                     <th>Tanggal Rekam</th>
-                                    <td>{{ $appointment->medicalRecord->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $appointment->medicalRecord->created_at->format('d/m/Y H:i') ?? 'N/A' }}</td>
                                 </tr>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Resep Obat -->
-                    @if($appointment->medicalRecord->prescriptionItems->count() > 0)
+                    <!-- Resep Obat menggunakan prescriptions -->
+                    @php
+                        $hasPrescriptions = $appointment->medicalRecord && 
+                                        $appointment->medicalRecord->prescriptions &&
+                                        $appointment->medicalRecord->prescriptions->isNotEmpty();
+                    @endphp
+
+                    @if($hasPrescriptions)
                     <div class="mt-4">
                         <h6>Resep Obat</h6>
                         <div class="table-responsive">
@@ -151,17 +157,34 @@
                                     <tr>
                                         <th>Nama Obat</th>
                                         <th>Jumlah</th>
-                                        <th>Tipe</th>
+                                        <th>Tipe Obat</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($appointment->medicalRecord->prescriptionItems as $item)
+                                    @foreach($appointment->medicalRecord->prescriptions as $prescription)
                                     <tr>
-                                        <td>{{ $item->medicine->nama_obat }}</td>
-                                        <td>{{ $item->jumlah }}</td>
+                                        <td>{{ $prescription->medicine->nama_obat ?? 'N/A' }}</td>
+                                        <td>{{ $prescription->quantity ?? 'N/A' }}</td>
                                         <td>
-                                            <span class="badge bg-{{ $item->medicine->tipe_obat === 'keras' ? 'danger' : 'success' }}">
-                                                {{ ucfirst($item->medicine->tipe_obat) }}
+                                            @php
+                                                $tipeObat = $prescription->medicine->tipe_obat ?? '';
+                                                $badgeColor = $tipeObat === 'keras' ? 'danger' : 'success';
+                                            @endphp
+                                            <span class="badge bg-{{ $badgeColor }}">
+                                                {{ ucfirst($tipeObat) ?: 'N/A' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @php
+                                                $statusColors = [
+                                                    'pending' => 'warning',
+                                                    'approved' => 'success',
+                                                    'rejected' => 'danger'
+                                                ];
+                                            @endphp
+                                            <span class="badge bg-{{ $statusColors[$prescription->status] ?? 'secondary' }}">
+                                                {{ ucfirst($prescription->status) }}
                                             </span>
                                         </td>
                                     </tr>
@@ -170,11 +193,26 @@
                             </table>
                         </div>
                     </div>
+                    @else
+                    <div class="mt-4">
+                        <p class="text-muted">Tidak ada resep obat untuk rekam medis ini.</p>
+                    </div>
                     @endif
                 </div>
             </div>
+            @else
+            <!-- Tampilkan pesan jika belum ada rekam medis -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-file-medical me-2"></i>Rekam Medis</h5>
+                </div>
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-file-medical-alt fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Belum Ada Rekam Medis</h5>
+                    <p class="text-muted">Rekam medis untuk janji temu ini belum dibuat.</p>
+                </div>
+            </div>
             @endif
-        </div>
 
         <!-- Sidebar Actions -->
         <div class="col-lg-4">

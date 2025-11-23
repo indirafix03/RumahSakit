@@ -74,6 +74,19 @@
                         </div>
                     </div>
                 </div>
+                <div class="mb-3">
+                    <label for="expired_date" class="form-label">Tanggal Kadaluarsa</label>
+                    <input type="date" 
+                        class="form-control @error('expired_date') is-invalid @enderror" 
+                        id="expired_date" 
+                        name="expired_date" 
+                        value="{{ old('expired_date', isset($medicine) ? $medicine->expired_date?->format('Y-m-d') : '') }}"
+                        min="{{ date('Y-m-d') }}">
+                    <div class="form-text">Kosongkan jika tidak ada tanggal kadaluarsa</div>
+                    @error('expired_date')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
                 <div class="d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Simpan Perubahan
