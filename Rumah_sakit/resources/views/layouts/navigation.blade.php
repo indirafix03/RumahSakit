@@ -64,6 +64,12 @@
         </div>
     </div>
 
+    <li class="nav-item">
+        <a href="{{ route('pasien.information') }}" class="nav-link">
+            <i class="fas fa-info-circle"></i> Informasi Layanan
+        </a>
+    </li>
+
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">

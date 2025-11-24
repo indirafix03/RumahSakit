@@ -128,7 +128,7 @@
                 </div>
                 <div class="card-body">
                     <p><strong>Status:</strong> 
-                        <span class="badge badge-{{ $appointment->status == 'pending' ? 'warning' : 'secondary' }}">
+                        <span class="badge bg-{{ $appointment->status == 'pending' ? 'warning' : 'secondary' }}"> {{-- PERBAIKAN: bg- bukan badge- --}}
                             {{ $appointment->status }}
                         </span>
                     </p>
@@ -233,6 +233,12 @@ $(document).ready(function() {
             loadSchedules();
         }
     }
+
+    @if($appointment->dokter_id && $appointment->tanggal_booking)
+        setTimeout(() => {
+            loadSchedules();
+        }, 500);
+    @endif
 });
 </script>
 @endsection

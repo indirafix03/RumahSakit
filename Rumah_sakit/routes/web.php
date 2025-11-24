@@ -7,7 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Dokter\ScheduleController;
 use App\Http\Controllers\Dokter\AppointmentController;
 use App\Http\Controllers\Dokter\MedicalRecordController;
-
+use App\Http\Controllers\Pasien\PasienController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -89,6 +89,7 @@ Route::middleware(['auth', 'verified', 'dokter'])->prefix('dokter')->name('dokte
 Route::prefix('pasien')->middleware(['auth', 'pasien'])->name('pasien.')->group(function () {
     $pasienController = App\Http\Controllers\Pasien\PasienController::class;
 
+    Route::get('/dashboard', [$pasienController, 'index'])->name('dashboard');
     // Appointments - CRUD
     Route::get('/appointments', [$pasienController, 'appointments'])->name('appointments.index');
     Route::get('/appointments/create', [$pasienController, 'createAppointment'])->name('appointments.create');
@@ -106,6 +107,13 @@ Route::prefix('pasien')->middleware(['auth', 'pasien'])->name('pasien.')->group(
     // AJAX
     Route::get('/get-doctors/{poliId}', [$pasienController, 'getDoctorsByPoli'])->name('get-doctors');
     Route::get('/get-time-slots/{dokterId}/{date}', [$pasienController, 'getDoctorTimeSlots'])->name('get-time-slots');
+
+    Route::get('/information', [PasienController::class, 'information'])->name('information');
+
+    // Prescriptions Routes
+    Route::get('/prescriptions', [PasienController::class, 'prescriptions'])->name('prescriptions.index');
+    Route::get('/prescriptions/{id}', [PasienController::class, 'showPrescription'])->name('prescriptions.show');
+    Route::post('/prescriptions/{id}/confirm-pickup', [PasienController::class, 'confirmPickup'])->name('prescriptions.confirm-pickup');
 });
 
 // routes/web.php - tambahkan route debugging

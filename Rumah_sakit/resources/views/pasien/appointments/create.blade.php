@@ -29,12 +29,11 @@
                         </div>
                     @endif
 
+                    {{-- Di bagian alert error --}}
                     @if(session('error'))
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             {{ session('error') }}
-                            <button type="button" class="close" data-dismiss="alert">
-                                <span>&times;</span>
-                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> {{-- PERBAIKAN: data-bs-dismiss --}}
                         </div>
                     @endif
 
@@ -153,15 +152,15 @@
                     <h6 class="mb-0">Informasi</h6>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-info">
-                        <h6><i class="fas fa-info-circle"></i> Petunjuk:</h6>
-                        <ol class="pl-3 mb-0">
-                            <li>Pilih poli yang sesuai dengan keluhan Anda</li>
-                            <li>Pilih dokter yang tersedia</li>
-                            <li>Tentukan tanggal dan waktu kunjungan</li>
-                            <li>Jelaskan keluhan secara singkat</li>
-                        </ol>
-                    </div>
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle"></i> Petunjuk:</h6>
+                            <ol class="mb-0 ps-3"> {{-- PERBAIKAN: ps-3 bukan pl-3 --}}
+                                <li>Pilih poli yang sesuai dengan keluhan Anda</li>
+                                <li>Pilih dokter yang tersedia</li>
+                                <li>Tentukan tanggal dan waktu kunjungan</li>
+                                <li>Jelaskan keluhan secara singkat</li>
+                            </ol>
+                        </div>
                     <div class="alert alert-warning">
                         <h6><i class="fas fa-exclamation-triangle"></i> Perhatian:</h6>
                         <ul class="pl-3 mb-0">

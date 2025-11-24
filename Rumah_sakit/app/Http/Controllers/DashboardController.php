@@ -18,10 +18,8 @@ class DashboardController extends Controller
         if ($user->isAdmin()) {
             return $this->adminDashboard();
         } elseif ($user->isPasien()) {
-            return $this->pasienDashboard();
-        }
-
-        if ($user->isDokter()) {
+            return redirect()->route('pasien.dashboard');
+        } elseif ($user->isDokter()) {
             return redirect()->route('dokter.dashboard');
         }
         
@@ -122,34 +120,4 @@ class DashboardController extends Controller
         'poliStats'
     ));
 }
-
-    private function pasienDashboard()
-    {
-        $pasien = auth()->user();
-        
-        $lastAppointment = Appointment::with(['dokter', 'dokter.poli', 'schedule'])
-            ->where('pasien_id', $pasien->id)
-            ->latest()
-            ->first();
-
-        $approvedAppointments = Appointment::with(['dokter', 'dokter.poli', 'schedule'])
-            ->where('pasien_id', $pasien->id)
-            ->where('status', 'approved')
-            ->where('tanggal_booking', '>=', today())
-            ->get();
-
-        // Hitung statistik untuk pasien
-        $stats = [
-            'pending_appointments' => Appointment::where('pasien_id', $pasien->id)
-                ->where('status', 'pending')
-                ->count(),
-            'today_appointments' => Appointment::where('pasien_id', $pasien->id)
-                ->where('status', 'approved')
-                ->whereDate('tanggal_booking', today())
-                ->count(),
-            'total_appointments' => Appointment::where('pasien_id', $pasien->id)->count(),
-        ];
-
-        return view('pasien.dashboard', compact('lastAppointment', 'approvedAppointments', 'stats'));
-    }
 }

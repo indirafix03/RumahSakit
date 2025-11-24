@@ -12,6 +12,7 @@
 
     <!-- Statistics Cards -->
     <div class="row">
+        <!-- Menunggu Validasi -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
@@ -29,6 +30,7 @@
             </div>
         </div>
 
+        <!-- Janji Hari Ini -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
@@ -46,6 +48,7 @@
             </div>
         </div>
 
+        <!-- Resep Siap -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-info shadow h-100 py-2">
                 <div class="card-body">
@@ -54,16 +57,17 @@
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                 Resep Siap</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $readyPrescriptions ?? 0 }}</div>
+                            <small class="text-muted">Siap diambil</small>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-prescription fa-2x text-gray-300"></i>
+                            <i class="fas fa-prescription-bottle fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Tambahkan card untuk Total Rekam Medis -->
+        <!-- Total Rekam Medis - PERBAIKAN DI SINI -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
@@ -71,7 +75,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Total Rekam Medis</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $readyPrescriptions ?? 0 }}</div> 
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalMedicalRecords ?? 0 }}</div> <!-- PERUBAHAN -->
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-notes-medical fa-2x text-gray-300"></i>
@@ -99,7 +103,7 @@
                         ];
                         $badge_class = $status_badge[$latestAppointment->status] ?? 'secondary';
                     @endphp
-                    <span class="badge badge-{{ $badge_class }}">
+                    <span class="badge bg-{{ $badge_class }}"> <!-- PERUBAHAN: bg- bukan badge- -->
                         {{ ucfirst($latestAppointment->status) }}
                     </span>
                 </div>
@@ -110,8 +114,8 @@
                             <p><strong>Tanggal:</strong> {{ $latestAppointment->tanggal_booking->format('d F Y') }}</p>
                             <p><strong>Waktu:</strong> 
                                 @if($latestAppointment->schedule)
-                                    {{ $latestAppointment->schedule->jam_mulai }} 
-                                    ({{ $latestAppointment->schedule->session_duration ?? 0 }} menit) 
+                                    {{ \Carbon\Carbon::parse($latestAppointment->schedule->jam_mulai)->format('H:i') }} 
+                                    - {{ \Carbon\Carbon::parse($latestAppointment->schedule->jam_selesai)->format('H:i') }}
                                 @else
                                     Tidak tersedia
                                 @endif
@@ -121,7 +125,7 @@
                             <p><strong>Poli:</strong> {{ $latestAppointment->dokter->poli->nama_poli ?? 'N/A' }}</p>
                             <p><strong>Hari:</strong> 
                                 @if($latestAppointment->schedule)
-                                    {{ ucfirst($latestAppointment->schedule->day) }}
+                                    {{ ucfirst($latestAppointment->schedule->hari) }} <!-- PERUBAHAN: hari bukan day -->
                                 @else
                                     Tidak tersedia
                                 @endif
@@ -158,6 +162,16 @@
     </div>
     @endif
 
+    {{-- Di resources/views/pasien/dashboard.blade.php --}}
+    @if($readyPrescriptions > 0)
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-prescription-bottle me-2"></i>
+        Anda memiliki <strong>{{ $readyPrescriptions }} resep</strong> yang siap diambil!
+        <a href="{{ route('pasien.medical-records.index') }}" class="alert-link">Lihat detail</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    @endif
+
     <!-- Quick Actions -->
     <div class="row">
         <div class="col-lg-12">
@@ -185,6 +199,11 @@
                         <div class="col-md-3 mb-3">
                             <a href="{{ route('profile.edit') }}" class="btn btn-warning btn-block">
                                 <i class="fas fa-user-edit"></i> Edit Profil
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ route('pasien.prescriptions.index') }}" class="btn btn-info btn-block">
+                                <i class="fas fa-prescription-bottle"></i> Lihat Resep
                             </a>
                         </div>
                     </div>

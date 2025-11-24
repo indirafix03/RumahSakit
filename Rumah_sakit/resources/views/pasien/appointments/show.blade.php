@@ -31,8 +31,11 @@
                         <div class="col-md-6">
                             <p><strong>Hari:</strong> {{ $appointment->schedule->hari }}</p>
                             <p><strong>Status:</strong> 
-                                <span class="badge badge-{{ $appointment->status == 'approved' ? 'success' : ($appointment->status == 'pending' ? 'warning' : ($appointment->status == 'selesai' ? 'info' : 'danger')) }}">
-                                    {{ $appointment->status }}
+                                <span class="badge bg-{{ 
+                                    $appointment->status == 'approved' ? 'success' : 
+                                    ($appointment->status == 'pending' ? 'warning' : 
+                                    ($appointment->status == 'selesai' ? 'info' : 'danger')) 
+                                    }}">{{ $appointment->status }}
                                 </span>
                             </p>
                             <p><strong>Dibuat:</strong> {{ $appointment->created_at->format('d/m/Y H:i') }}</p>
