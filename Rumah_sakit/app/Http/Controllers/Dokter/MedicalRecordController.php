@@ -157,13 +157,13 @@ class MedicalRecordController extends Controller
 
     public function edit(MedicalRecord $medicalRecord)
     {
+        // Authorization check
         if ($medicalRecord->dokter_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
         $medicines = Medicine::where('stok', '>', 0)->get();
-        $medicalRecord->load('prescriptions.medicine');
-
+        
         return view('dokter.medical-records.edit', compact('medicalRecord', 'medicines'));
     }
 
@@ -177,19 +177,73 @@ class MedicalRecordController extends Controller
             'diagnosis' => 'required|string|max:1000',
             'tindakan_medis' => 'required|string|max:1000',
             'catatan' => 'nullable|string|max:1000',
+            'obat_id' => 'required|array|min:1',
+            'obat_id.*' => 'required|exists:medicines,id',
+            'jumlah' => 'required|array|min:1',
+            'jumlah.*' => 'required|integer|min:1|max:100',
         ]);
-
+        
         try {
+            DB::beginTransaction();
+
+            // 1. Update data rekam medis
             $medicalRecord->update([
                 'diagnosis' => $request->diagnosis,
                 'tindakan_medis' => $request->tindakan_medis,
                 'catatan' => $request->catatan,
             ]);
 
+            \Log::info('Medical Record updated successfully');
+
+            // 2. HAPUS SEMUA RESEP LAMA DAN KEMBALIKAN STOK
+            foreach ($medicalRecord->prescriptions as $prescription) {
+                $medicine = Medicine::find($prescription->medicine_id);
+                if ($medicine) {
+                    $medicine->increment('stok', $prescription->quantity);
+                    \Log::info("Returned stock for medicine {$medicine->id}: {$prescription->quantity}");
+                }
+            }
+            
+            // Hapus semua resep lama
+            $medicalRecord->prescriptions()->delete();
+            \Log::info('Old prescriptions deleted');
+
+            // 3. BUAT RESEP BARU
+            foreach ($request->obat_id as $index => $obat_id) {
+                $quantity = $request->jumlah[$index];
+                $medicine = Medicine::find($obat_id);
+                
+                if (!$medicine) {
+                    throw new \Exception("Obat dengan ID {$obat_id} tidak ditemukan");
+                }
+                
+                // Validasi stok
+                if ($medicine->stok < $quantity) {
+                    throw new \Exception("Stok {$medicine->nama_obat} tidak mencukupi. Stok tersedia: {$medicine->stok}");
+                }
+
+                // Buat resep baru
+                Prescription::create([
+                    'medical_record_id' => $medicalRecord->id,
+                    'medicine_id' => $obat_id,
+                    'quantity' => $quantity,
+                    'status' => 'pending'
+                ]);
+
+                // Kurangi stok
+                $medicine->decrement('stok', $quantity);
+                \Log::info("Created prescription for medicine {$obat_id} with quantity {$quantity}");
+            }
+
+            DB::commit();
+
             return redirect()->route('dokter.medical-records.index')
                 ->with('success', 'Rekam medis berhasil diperbarui.');
 
         } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error updating medical record: ' . $e->getMessage());
+            
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
                 ->withInput();

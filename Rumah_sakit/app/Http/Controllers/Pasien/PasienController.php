@@ -396,11 +396,22 @@ class PasienController extends Controller
         \Log::info('=== getDoctorsByPoli START ===', ['poliId' => $poliId]);
         
         try {
+            // Query doctors berdasarkan poli_id
             $doctors = User::where('poli_id', $poliId)
                 ->where('role', 'dokter')
-                ->with(['schedules'])
+                ->with(['schedules' => function($query) {
+                    $query->orderByRaw("FIELD(hari, 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu')")
+                        ->orderBy('jam_mulai');
+                }])
                 ->get()
                 ->map(function($doctor) {
+                    \Log::info('Doctor data', [
+                        'id' => $doctor->id,
+                        'name' => $doctor->name,
+                        'schedules_count' => $doctor->schedules->count()
+                    ]);
+                    
+                    // Format schedules dengan detail lengkap
                     $formattedSchedules = $doctor->schedules->map(function($schedule) {
                         $jamMulai = \Carbon\Carbon::parse($schedule->jam_mulai);
                         $jamSelesai = $jamMulai->copy()->addMinutes($schedule->durasi);
@@ -408,17 +419,40 @@ class PasienController extends Controller
                         return [
                             'id' => $schedule->id,
                             'hari' => $schedule->hari,
+                            'hari_indonesia' => $this->getIndonesianDayName($schedule->hari),
                             'jam_mulai' => $schedule->jam_mulai,
+                            'jam_mulai_formatted' => $jamMulai->format('H:i'),
                             'jam_selesai' => $jamSelesai->format('H:i:s'),
-                            'durasi' => $schedule->durasi
+                            'jam_selesai_formatted' => $jamSelesai->format('H:i'),
+                            'durasi' => $schedule->durasi,
+                            'slot_text' => $jamMulai->format('H:i') . ' - ' . $jamSelesai->format('H:i')
                         ];
                     });
-                    
+
+                    // Group schedules by day untuk tampilan yang lebih terorganisir
+                    $groupedSchedules = $formattedSchedules->groupBy('hari_indonesia')->map(function($schedules, $day) {
+                        return [
+                            'day_name' => $day,
+                            'slots' => $schedules->map(function($slot) {
+                                return [
+                                    'id' => $slot['id'],
+                                    'time' => $slot['slot_text'],
+                                    'jam_mulai' => $slot['jam_mulai_formatted'],
+                                    'jam_selesai' => $slot['jam_selesai_formatted'],
+                                    'durasi' => $slot['durasi']
+                                ];
+                            })
+                        ];
+                    })->values();
+
                     return [
                         'id' => $doctor->id,
                         'name' => $doctor->name,
                         'spesialisasi' => $doctor->spesialisasi,
-                        'schedules' => $formattedSchedules
+                        'total_schedules' => $doctor->schedules->count(),
+                        'schedules' => $formattedSchedules,
+                        'grouped_schedules' => $groupedSchedules,
+                        'available_days' => $formattedSchedules->pluck('hari_indonesia')->unique()->values()
                     ];
                 });
 
@@ -439,6 +473,28 @@ class PasienController extends Controller
             return response()->json([]);
         }
     }
+
+    private function getIndonesianDayName($day)
+{
+    $days = [
+        'monday' => 'Senin',
+        'tuesday' => 'Selasa',
+        'wednesday' => 'Rabu',
+        'thursday' => 'Kamis',
+        'friday' => 'Jumat',
+        'saturday' => 'Sabtu',
+        'sunday' => 'Minggu',
+        'senin' => 'Senin',
+        'selasa' => 'Selasa',
+        'rabu' => 'Rabu',
+        'kamis' => 'Kamis',
+        'jumat' => 'Jumat',
+        'sabtu' => 'Sabtu',
+        'minggu' => 'Minggu'
+    ];
+
+    return $days[strtolower($day)] ?? ucfirst($day);
+}
 
     /**
      * Get available time slots for doctor
@@ -633,6 +689,143 @@ class PasienController extends Controller
             ]);
             
             return [];
+        }
+    }
+
+    public function schedules(Request $request)
+    {
+        $polis = Poli::withCount('doctors')->get();
+        
+        // Get filter parameters
+        $poliFilter = $request->get('poli');
+        $dayFilter = $request->get('day');
+        $viewType = $request->get('view', 'grid'); // grid or list
+
+        // Base query for schedules
+        $schedulesQuery = Schedule::with(['doctor.poli'])
+            ->whereHas('doctor', function($query) {
+                $query->where('role', 'dokter');
+            });
+
+        // Apply poli filter
+        if ($poliFilter) {
+            $schedulesQuery->whereHas('doctor', function($query) use ($poliFilter) {
+                $query->where('poli_id', $poliFilter);
+            });
+        }
+
+        // Apply day filter
+        if ($dayFilter) {
+            $schedulesQuery->where('hari', $dayFilter);
+        }
+
+        $schedules = $schedulesQuery->orderBy('hari')->orderBy('jam_mulai')->get();
+
+        // Group schedules by day for better organization
+        $groupedSchedules = $schedules->groupBy('hari');
+
+        // Get available days for filter
+        $availableDays = Schedule::select('hari')
+            ->distinct()
+            ->orderByRaw("FIELD(hari, 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu')")
+            ->pluck('hari');
+
+        return view('pasien.schedules.index', compact(
+            'schedules',
+            'groupedSchedules',
+            'polis',
+            'availableDays',
+            'poliFilter',
+            'dayFilter',
+            'viewType'
+        ));
+    }
+
+    public function getAvailableSlots($doctorId, $date)
+    {
+        try {
+            $dayMap = [
+                'Sunday' => 'minggu',
+                'Monday' => 'senin', 
+                'Tuesday' => 'selasa',
+                'Wednesday' => 'rabu',
+                'Thursday' => 'kamis',
+                'Friday' => 'jumat',
+                'Saturday' => 'sabtu'
+            ];
+
+            $carbonDate = Carbon::parse($date);
+            $englishDay = $carbonDate->englishDayOfWeek;
+            $dayName = $dayMap[$englishDay] ?? null;
+
+            if (!$dayName) {
+                return response()->json([]);
+            }
+
+            // Get doctor's schedules for the specific day
+            $schedules = Schedule::where('dokter_id', $doctorId)
+                ->where('hari', $dayName)
+                ->get();
+
+            // Check availability for each schedule slot
+            $availableSlots = $schedules->map(function($schedule) use ($date, $doctorId) {
+                $appointmentCount = Appointment::where('dokter_id', $doctorId)
+                    ->where('schedule_id', $schedule->id)
+                    ->where('tanggal_booking', $date)
+                    ->whereIn('status', ['pending', 'approved'])
+                    ->count();
+
+                $isAvailable = $appointmentCount < 5; // Max 5 patients per slot
+                $availableSeats = 5 - $appointmentCount;
+
+                return [
+                    'id' => $schedule->id,
+                    'jam_mulai' => Carbon::parse($schedule->jam_mulai)->format('H:i'),
+                    'jam_selesai' => Carbon::parse($schedule->jam_selesai)->format('H:i'),
+                    'is_available' => $isAvailable,
+                    'available_seats' => $availableSeats,
+                    'appointment_count' => $appointmentCount
+                ];
+            });
+
+            return response()->json($availableSlots);
+
+        } catch (\Exception $e) {
+            return response()->json([]);
+        }
+    }
+
+     public function getDoctorSchedule($doctorId)
+    {
+        try {
+            $doctor = User::with(['poli', 'schedules'])
+                ->where('id', $doctorId)
+                ->where('role', 'dokter')
+                ->firstOrFail();
+
+            $schedules = $doctor->schedules->map(function($schedule) {
+                return [
+                    'id' => $schedule->id,
+                    'hari' => $schedule->hari,
+                    'jam_mulai' => Carbon::parse($schedule->jam_mulai)->format('H:i'),
+                    'jam_selesai' => Carbon::parse($schedule->jam_selesai)->format('H:i'),
+                    'durasi' => $schedule->durasi
+                ];
+            });
+
+            return response()->json([
+                'doctor' => [
+                    'id' => $doctor->id,
+                    'name' => $doctor->name,
+                    'spesialisasi' => $doctor->spesialisasi,
+                    'poli' => $doctor->poli->nama_poli ?? 'N/A',
+                    'bio' => $doctor->bio
+                ],
+                'schedules' => $schedules
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Doctor not found'], 404);
         }
     }
 }

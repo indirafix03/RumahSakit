@@ -48,7 +48,7 @@
                                 <tr>
                                     <th>Pasien</th>
                                     <th>Tanggal</th>
-                                    <th>Jam</th>
+                                    <th>Waktu</th>
                                     <th>Keluhan</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -56,11 +56,19 @@
                             <tbody>
                                 @foreach($pendingAppointments as $appointment)
                                 <tr>
-                                    <td>{{ $appointment->pasien->name }}</td>
-                                    {{-- Menggunakan tanggal_booking sesuai dengan casting di Model Appointment --}}
+                                    <td>{{ $appointment->pasien->name ?? 'N/A' }}</td>
                                     <td>{{ $appointment->tanggal_booking?->format('d/m/Y') ?? 'T/A' }}</td>
-                                    <td>{{ $appointment->jam }}</td>
-                                    <td>{{ Str::limit($appointment->keluhan, 50) }}</td>
+                                    <td>
+                                        @if($appointment->schedule)
+                                            {{ \Carbon\Carbon::parse($appointment->schedule->jam_mulai)->format('H:i') }} - 
+                                            {{ \Carbon\Carbon::parse($appointment->schedule->jam_selesai)->format('H:i') }}
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ Str::limit($appointment->keluhan_singkat ?? 'Tidak ada keluhan', 50) }}
+                                    </td>
                                     <td>
                                         <button type="button" class="btn btn-success btn-sm" 
                                                 data-bs-toggle="modal" 
@@ -98,18 +106,25 @@
                                 <tr>
                                     <th>Pasien</th>
                                     <th>Tanggal</th>
-                                    <th>Jam</th>
+                                    <th>Waktu</th>
                                     <th>Keluhan</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($approvedAppointments as $appointment)
                                 <tr>
-                                    <td>{{ $appointment->pasien->name }}</td>
-                                    {{-- Menggunakan tanggal_booking sesuai dengan casting di Model Appointment --}}
+                                    <td>{{ $appointment->pasien->name ?? 'N/A' }}</td>
                                     <td>{{ $appointment->tanggal_booking?->format('d/m/Y') ?? 'T/A' }}</td>
-                                    <td>{{ $appointment->jam }}</td>
-                                    <td>{{ Str::limit($appointment->keluhan, 50) }}</td>
+                                    <td>
+                                        @if($appointment->schedule)
+                                            {{ \Carbon\Carbon::parse($appointment->schedule->jam_mulai)->format('H:i') }}
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ Str::limit($appointment->keluhan_singkat ?? 'Tidak ada keluhan', 50) }}
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -139,10 +154,15 @@
                             <tbody>
                                 @foreach($rejectedAppointments as $appointment)
                                 <tr>
-                                    <td>{{ $appointment->pasien->name }}</td>
-                                    {{-- Menggunakan tanggal_booking sesuai dengan casting di Model Appointment --}}
+                                    <td>{{ $appointment->pasien->name ?? 'N/A' }}</td>
                                     <td>{{ $appointment->tanggal_booking?->format('d/m/Y') ?? 'T/A' }}</td>
-                                    <td>{{ $appointment->alasan_penolakan }}</td>
+                                    <td>
+                                        @if($appointment->alasan_reject) 
+                                            {{ $appointment->alasan_reject }}
+                                        @else
+                                            <span class="text-muted">Tidak ada alasan</span>
+                                        @endif
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -172,10 +192,15 @@
                             <tbody>
                                 @foreach($completedAppointments as $appointment)
                                 <tr>
-                                    <td>{{ $appointment->pasien->name }}</td>
-                                    {{-- Menggunakan tanggal_booking sesuai dengan casting di Model Appointment --}}
+                                    <td>{{ $appointment->pasien->name ?? 'N/A' }}</td>
                                     <td>{{ $appointment->tanggal_booking?->format('d/m/Y') ?? 'T/A' }}</td>
-                                    <td>{{ $appointment->medicalRecord ? Str::limit($appointment->medicalRecord->diagnosis, 50) : '-' }}</td>
+                                    <td>
+                                        @if($appointment->medicalRecord)
+                                            {{ Str::limit($appointment->medicalRecord->diagnosis, 50) }}
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -227,8 +252,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="alasan" class="form-label">Alasan Penolakan</label>
-                        <textarea class="form-control" id="alasan" name="alasan" rows="3" required></textarea>
+                        <label for="alasan_reject" class="form-label">Alasan Penolakan</label> <!-- ← UBAH ID DAN NAME -->
+                        <textarea class="form-control" id="alasan_reject" name="alasan_reject" rows="3" required></textarea> <!-- ← PERBAIKAN -->
                     </div>
                     <input type="hidden" name="status" value="rejected">
                 </div>
@@ -240,7 +265,6 @@
         </div>
     </div>
 </div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Approve Modal

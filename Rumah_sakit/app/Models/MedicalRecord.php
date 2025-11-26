@@ -25,12 +25,6 @@ class MedicalRecord extends Model
         return $this->belongsTo(Appointment::class);
     }
 
-    // MedicalRecord has many ResepObat
-    public function resepObat()
-    {
-        return $this->hasMany(ResepObat::class);
-    }
-
     // Accessor untuk mendapatkan data pasien melalui appointment
     public function getPatientAttribute()
     {

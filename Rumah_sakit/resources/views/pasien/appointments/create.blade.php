@@ -220,10 +220,11 @@ $(document).ready(function() {
     });
 
     // GET DOCTORS
-    function loadDoctors(poliId) {
-        $('#doctorsList').html(`<div class="text-center p-3">
+        function loadDoctors(poliId) {
+        $('#doctorsList').html(`<div class="text-center p-4">
             <div class="spinner-border text-primary"></div>
-            <p>Memuat dokter...</p></div>`);
+            <p class="mt-2">Memuat daftar dokter...</p>
+        </div>`);
 
         let urlGetDoctors = "{{ route('pasien.get-doctors', ':id') }}".replace(':id', poliId);
 
@@ -233,26 +234,122 @@ $(document).ready(function() {
 
                 if (data.length === 0) {
                     return $('#doctorsList').html(
-                        `<p class="text-muted text-center">Tidak ada dokter.</p>`
+                        `<div class="col-12 text-center py-4">
+                            <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Tidak ada dokter tersedia di poli ini.</p>
+                        </div>`
                     );
                 }
 
-                data.forEach(d => {
+                data.forEach(doctor => {
+                    let scheduleBadge = '';
+                    if (doctor.total_schedules > 0) {
+                        scheduleBadge = `<span class="badge bg-success ms-2">${doctor.total_schedules} jadwal</span>`;
+                    }
+
+                    let scheduleHTML = '';
+                    if (doctor.grouped_schedules.length > 0) {
+                        scheduleHTML = `
+                            <div class="mt-3">
+                                <h6 class="text-primary mb-2">
+                                    <i class="fas fa-calendar-alt me-1"></i>Jadwal Praktik:
+                                </h6>
+                                <div class="row">
+                                    ${doctor.grouped_schedules.map(daySchedule => `
+                                        <div class="col-md-6 mb-2">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body py-2">
+                                                    <h6 class="card-title small text-primary mb-1">
+                                                        ${daySchedule.day_name}
+                                                    </h6>
+                                                    ${daySchedule.slots.map(slot => `
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <small class="text-muted">${slot.time}</small>
+                                                            <small class="badge bg-outline-primary">${slot.durasi}m</small>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        scheduleHTML = `<p class="text-muted small mt-2"><i class="fas fa-info-circle me-1"></i>Belum ada jadwal tersedia</p>`;
+                    }
+
                     $('#doctorsList').append(`
-                        <div class="col-md-6 mb-3">
-                            <div class="card doctor-card" data-dokter-id="${d.id}" data-dokter-name="${d.name}">
+                        <div class="col-md-6 mb-4">
+                            <div class="card doctor-card h-100" 
+                                 data-dokter-id="${doctor.id}" 
+                                 data-dokter-name="${doctor.name}"
+                                 style="cursor: pointer; transition: all 0.3s ease;">
                                 <div class="card-body">
-                                    <h6 class="card-title">Dr. ${d.name}</h6>
-                                    <p class="small text-muted">${d.spesialisasi ?? '-'}</p>
-                                    <p class="small"><i class="fas fa-clock"></i> ${d.schedules.length} jadwal</p>
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title text-primary mb-0">
+                                            Dr. ${doctor.name}
+                                            ${scheduleBadge}
+                                        </h6>
+                                        <i class="fas fa-check-circle text-success fa-lg doctor-check" style="opacity: 0;"></i>
+                                    </div>
+                                    
+                                    <p class="card-text small text-muted mb-2">
+                                        <i class="fas fa-stethoscope me-1"></i>
+                                        ${doctor.spesialisasi || 'Dokter Umum'}
+                                    </p>
+
+                                    ${scheduleHTML}
+
+                                    <div class="mt-3 pt-2 border-top">
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Tersedia di ${doctor.available_days.length} hari
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <small class="text-success">
+                                        <i class="fas fa-calendar-check me-1"></i>
+                                        Klik untuk memilih dokter ini
+                                    </small>
                                 </div>
                             </div>
                         </div>
                     `);
                 });
             })
-            .fail(() => alert("Gagal memuat dokter"));
+            .fail(() => {
+                $('#doctorsList').html(
+                    `<div class="col-12 text-center py-4">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger mb-3"></i>
+                        <p class="text-danger">Gagal memuat data dokter. Silakan coba lagi.</p>
+                    </div>`
+                );
+            });
     }
+
+    // PILIH DOKTER dengan efek visual
+    $(document).on('click', '.doctor-card', function() {
+        // Reset semua card
+        $('.doctor-card').removeClass('border-primary shadow').addClass('border-light');
+        $('.doctor-check').css('opacity', '0');
+        
+        // Highlight card yang dipilih
+        $(this).removeClass('border-light').addClass('border-primary shadow');
+        $(this).find('.doctor-check').css('opacity', '1');
+
+        selectedDokter = $(this).data('dokter-id');
+        $('#dokter_id').val(selectedDokter);
+        $('.step-2 .next-step').prop('disabled', false);
+
+        $('#summaryDokter').text('Dr. ' + $(this).data('dokter-name'));
+
+        // Scroll ke next step smoothly
+        $('html, body').animate({
+            scrollTop: $('.step-2').offset().top - 100
+        }, 500);
+    });
 
     // PILIH DOKTER
     $(document).on('click', '.doctor-card', function() {
