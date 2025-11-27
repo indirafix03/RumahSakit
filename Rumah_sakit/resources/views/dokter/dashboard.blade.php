@@ -121,7 +121,7 @@
                                         <i class="fas fa-clock me-1"></i>
                                         @if($appointment->schedule)
                                             {{ \Carbon\Carbon::parse($appointment->schedule->jam_mulai)->format('H:i') }} - 
-                                            {{ \Carbon\Carbon::parse($appointment->schedule->jam_selesai)->format('H:i') }}
+                                            {{ \Carbon\Carbon::parse($appointment->schedule->jam_mulai)->addMinutes($appointment->schedule->durasi)->format('H:i') }}
                                         @else
                                             Waktu tidak tersedia
                                         @endif
@@ -132,7 +132,7 @@
                                     </small>
                                 </div>
                                 <div class="ms-3">
-                                    <a href="{{ route('dokter.medical-records.create', ['appointment_id' => $appointment->id]) }}" 
+                                    <a href="{{ route('dokter.medical-records.create-from-appointment', $appointment->id) }}" 
                                        class="btn btn-sm btn-success"
                                        data-bs-toggle="tooltip" title="Buat Rekam Medis">
                                         <i class="fas fa-file-medical me-1"></i>Mulai
@@ -205,7 +205,7 @@
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1">{{ $record->pasien->name ?? 'Pasien (ID: ' . $record->pasien_id . ')' }}</h6>
                                             <p class="mb-1 small text-muted">
-                                                {{ Str::limit($record->diagnosis, 60) ?? 'Tidak ada diagnosis' }}
+                                                {{ Str::limit($record->diagnosis ?? 'Belum ada diagnosis', 60) }}
                                             </p>
                                         </div>
                                         <small class="text-muted">{{ $record->created_at->format('d/m') }}</small>
@@ -250,7 +250,7 @@
                                         <p class="card-text mb-1">
                                             <strong class="h5">
                                                 {{ \Carbon\Carbon::parse($schedule->jam_mulai)->format('H:i') }} - 
-                                                {{ \Carbon\Carbon::parse($schedule->jam_selesai)->format('H:i') }}
+                                                {{ \Carbon\Carbon::parse($schedule->jam_mulai)->addMinutes($schedule->durasi)->format('H:i') }}
                                             </strong>
                                         </p>
                                     </div>
