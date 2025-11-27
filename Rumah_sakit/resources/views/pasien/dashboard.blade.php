@@ -67,7 +67,7 @@
             </div>
         </div>
         
-        <!-- Total Rekam Medis - PERBAIKAN DI SINI -->
+        <!-- Total Rekam Medis -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
@@ -75,7 +75,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Total Rekam Medis</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalMedicalRecords ?? 0 }}</div> <!-- PERUBAHAN -->
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalMedicalRecords ?? 0 }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-notes-medical fa-2x text-gray-300"></i>
@@ -94,16 +94,15 @@
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Janji Temu Terakhir</h6>
                     @php
-                        // Menentukan kelas badge berdasarkan status
                         $status_badge = [
                             'approved' => 'success',
-                            'pending' => 'warning',
+                            'pending' => 'warning', 
                             'rejected' => 'danger',
                             'selesai' => 'info'
                         ];
                         $badge_class = $status_badge[$latestAppointment->status] ?? 'secondary';
                     @endphp
-                    <span class="badge bg-{{ $badge_class }}"> <!-- PERUBAHAN: bg- bukan badge- -->
+                    <span class="badge bg-{{ $badge_class }}">
                         {{ ucfirst($latestAppointment->status) }}
                     </span>
                 </div>
@@ -125,7 +124,7 @@
                             <p><strong>Poli:</strong> {{ $latestAppointment->dokter->poli->nama_poli ?? 'N/A' }}</p>
                             <p><strong>Hari:</strong> 
                                 @if($latestAppointment->schedule)
-                                    {{ ucfirst($latestAppointment->schedule->hari) }} <!-- PERUBAHAN: hari bukan day -->
+                                    {{ ucfirst($latestAppointment->schedule->hari) }}
                                 @else
                                     Tidak tersedia
                                 @endif
@@ -140,6 +139,20 @@
                         <a href="{{ route('pasien.appointments.show', $latestAppointment->id) }}" class="btn btn-sm btn-outline-primary">
                             <i class="fas fa-eye me-1"></i> Detail Janji Temu
                         </a>
+                        
+                        {{-- TOMBOL FEEDBACK - HANYA TAMPIL JIKA STATUS SELESAI DAN BELUM ADA FEEDBACK --}}
+                        @if($latestAppointment->status === 'selesai' && !$latestAppointment->feedback)
+                            <a href="{{ route('pasien.feedback.create', $latestAppointment->id) }}" class="btn btn-sm btn-success">
+                                <i class="fas fa-star me-1"></i> Beri Feedback
+                            </a>
+                        @endif
+                        
+                        {{-- INFO JIKA SUDAH MEMBERIKAN FEEDBACK --}}
+                        @if($latestAppointment->status === 'selesai' && $latestAppointment->feedback)
+                            <span class="badge bg-success ms-2">
+                                <i class="fas fa-check me-1"></i> Sudah memberikan feedback
+                            </span>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -162,7 +175,7 @@
     </div>
     @endif
 
-    {{-- Di resources/views/pasien/dashboard.blade.php --}}
+    {{-- Notifikasi Resep Siap --}}
     @if($readyPrescriptions > 0)
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="fas fa-prescription-bottle me-2"></i>
@@ -204,6 +217,11 @@
                         <div class="col-md-3 mb-3">
                             <a href="{{ route('pasien.prescriptions.index') }}" class="btn btn-info btn-block">
                                 <i class="fas fa-prescription-bottle"></i> Lihat Resep
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ route('pasien.feedback.index') }}" class="btn btn-secondary btn-block">
+                                <i class="fas fa-comment-medical"></i> Feedback Saya
                             </a>
                         </div>
                     </div>

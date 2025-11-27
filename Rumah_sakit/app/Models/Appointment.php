@@ -73,4 +73,9 @@ class Appointment extends Model
     {
     return $this->belongsTo(Poli::class, 'poli_id');
     }
+
+    public function feedback()
+    {
+        return $this->hasOne(Feedback::class);
+    }
 }

@@ -8,7 +8,7 @@ use App\Http\Controllers\Dokter\AppointmentController;
 use App\Http\Controllers\Dokter\MedicalRecordController;
 use App\Http\Controllers\Pasien\PasienController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\FeedbackController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -63,35 +63,42 @@ Route::middleware(['auth'])->group(function () {
         $adminMedicalRecordController = App\Http\Controllers\Admin\MedicalRecordController::class;
         Route::resource('medical-records', $adminMedicalRecordController);
         Route::get('/medical-records/create/{appointment_id}', [$adminMedicalRecordController, 'create'])->name('medical-records.create');
+
+        // FEEDBACK ADMIN
+        Route::get('/feedback', [FeedbackController::class, 'indexAdmin'])->name('feedback.index');
+        Route::delete('/feedback/{id}', [FeedbackController::class, 'destroy'])->name('feedback.destroy');
         });
 
     // Dokter Routes
-    // ========== DOKTER ROUTES ========== 
-Route::middleware(['auth', 'verified', 'dokter'])->group(function () {
-    // DASHBOARD
-    Route::get('/dokter-dashboard', [App\Http\Controllers\Dokter\DashboardController::class, 'index'])->name('dokter.dashboard');
-    
-    // SCHEDULES
-    Route::get('/dokter-schedules', [App\Http\Controllers\Dokter\ScheduleController::class, 'index'])->name('dokter.schedules.index');
-    Route::post('/dokter-schedules', [App\Http\Controllers\Dokter\ScheduleController::class, 'store'])->name('dokter.schedules.store');
-    Route::put('/dokter-schedules/{schedule}', [App\Http\Controllers\Dokter\ScheduleController::class, 'update'])->name('dokter.schedules.update');
-    Route::delete('/dokter-schedules/{schedule}', [App\Http\Controllers\Dokter\ScheduleController::class, 'destroy'])->name('dokter.schedules.destroy');
-    
-    // APPOINTMENTS  
-    Route::get('/dokter-appointments', [App\Http\Controllers\Dokter\AppointmentController::class, 'index'])->name('dokter.appointments.index');
-    Route::get('/dokter-appointments/{appointment}', [App\Http\Controllers\Dokter\AppointmentController::class, 'show'])->name('dokter.appointments.show');
-    Route::put('/dokter-appointments/{appointment}/status', [App\Http\Controllers\Dokter\AppointmentController::class, 'updateStatus'])->name('dokter.appointments.update-status');
-    
-    // MEDICAL RECORDS
-    Route::get('/dokter-medical-records', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'index'])->name('dokter.medical-records.index');
-    Route::get('/dokter-medical-records/create', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'create'])->name('dokter.medical-records.create');
-    Route::get('/dokter-medical-records/create/{appointment_id}', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'createFromAppointment'])->name('dokter.medical-records.create-from-appointment');
-    Route::post('/dokter-medical-records', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'store'])->name('dokter.medical-records.store');
-    Route::get('/dokter-medical-records/{medical_record}', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'show'])->name('dokter.medical-records.show');
-    Route::get('/dokter-medical-records/{medical_record}/edit', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'edit'])->name('dokter.medical-records.edit');
-    Route::put('/dokter-medical-records/{medical_record}', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'update'])->name('dokter.medical-records.update');
-    Route::delete('/dokter-medical-records/{medical_record}', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'destroy'])->name('dokter.medical-records.destroy');
-});
+    Route::middleware(['auth', 'verified', 'dokter'])->group(function () {
+        // DASHBOARD
+        Route::get('/dokter-dashboard', [App\Http\Controllers\Dokter\DashboardController::class, 'index'])->name('dokter.dashboard');
+        
+        // SCHEDULES
+        Route::get('/dokter-schedules', [App\Http\Controllers\Dokter\ScheduleController::class, 'index'])->name('dokter.schedules.index');
+        Route::post('/dokter-schedules', [App\Http\Controllers\Dokter\ScheduleController::class, 'store'])->name('dokter.schedules.store');
+        Route::put('/dokter-schedules/{schedule}', [App\Http\Controllers\Dokter\ScheduleController::class, 'update'])->name('dokter.schedules.update');
+        Route::delete('/dokter-schedules/{schedule}', [App\Http\Controllers\Dokter\ScheduleController::class, 'destroy'])->name('dokter.schedules.destroy');
+        
+        // APPOINTMENTS  
+        Route::get('/dokter-appointments', [App\Http\Controllers\Dokter\AppointmentController::class, 'index'])->name('dokter.appointments.index');
+        Route::get('/dokter-appointments/{appointment}', [App\Http\Controllers\Dokter\AppointmentController::class, 'show'])->name('dokter.appointments.show');
+        Route::put('/dokter-appointments/{appointment}/status', [App\Http\Controllers\Dokter\AppointmentController::class, 'updateStatus'])->name('dokter.appointments.update-status');
+        
+        // MEDICAL RECORDS
+        Route::get('/dokter-medical-records', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'index'])->name('dokter.medical-records.index');
+        Route::get('/dokter-medical-records/create', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'create'])->name('dokter.medical-records.create');
+        Route::get('/dokter-medical-records/create/{appointment_id}', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'createFromAppointment'])->name('dokter.medical-records.create-from-appointment');
+        Route::post('/dokter-medical-records', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'store'])->name('dokter.medical-records.store');
+        Route::get('/dokter-medical-records/{medical_record}', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'show'])->name('dokter.medical-records.show');
+        Route::get('/dokter-medical-records/{medical_record}/edit', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'edit'])->name('dokter.medical-records.edit');
+        Route::put('/dokter-medical-records/{medical_record}', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'update'])->name('dokter.medical-records.update');
+        Route::delete('/dokter-medical-records/{medical_record}', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'destroy'])->name('dokter.medical-records.destroy');
+
+        // FEEDBACK DOKTER
+        Route::get('/dokter-feedback', [FeedbackController::class, 'indexDokter'])->name('dokter.feedback.index');
+        Route::delete('/dokter-feedback/{id}', [FeedbackController::class, 'destroy'])->name('dokter.feedback.destroy');
+    });
 
     // Pasien Routes
     Route::middleware(['verified', 'pasien'])
@@ -130,8 +137,10 @@ Route::middleware(['auth', 'verified', 'dokter'])->group(function () {
         Route::get('/schedules', [PasienController::class, 'schedules'])->name('schedules.index');
         Route::get('/doctors/{doctorId}/schedule', [PasienController::class, 'getDoctorSchedule'])->name('doctors.schedule');
         Route::get('/available-slots/{doctorId}/{date}', [PasienController::class, 'getAvailableSlots'])->name('available.slots');
-        });
-});
 
-// TEST DOKTER ROUTE - di luar middleware group
-Route::get('/test-dokter-route', [App\Http\Controllers\Dokter\DashboardController::class, 'index']);
+        // FEEDBACK PASIEN
+        Route::get('/feedback/create/{appointment_id}', [FeedbackController::class, 'create'])->name('feedback.create');
+        Route::post('/feedback/{appointment_id}', [FeedbackController::class, 'store'])->name('feedback.store');
+        Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
+    });
+});

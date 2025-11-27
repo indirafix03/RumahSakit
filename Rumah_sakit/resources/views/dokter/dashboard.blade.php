@@ -151,42 +151,44 @@
                 </div>
             </div>
         </div>
-
-        <!-- Quick Links & Recent Patients -->
-        <div class="col-lg-6">
-            <!-- Quick Links -->
-            <div class="card shadow mb-4">
-                <div class="card-header bg-success text-white py-3">
-                    <h6 class="m-0 font-weight-bold">
-                        <i class="fas fa-rocket me-2"></i>Akses Cepat
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <a href="{{ route('dokter.schedules.index') }}" class="btn btn-outline-primary w-100 text-start">
-                                <i class="fas fa-calendar-alt me-2"></i>Kelola Jadwal
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="{{ route('dokter.appointments.index') }}" class="btn btn-outline-info w-100 text-start">
-                                <i class="fas fa-list me-2"></i>Lihat Semua Janji
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="{{ route('dokter.medical-records.index') }}" class="btn btn-outline-warning w-100 text-start">
-                                <i class="fas fa-file-medical me-2"></i>Semua Rekam Medis
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary w-100 text-start">
-                                <i class="fas fa-user me-2"></i>Profil Saya
-                            </a>
-                        </div>
+    
+        <!-- Quick Links -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-success text-white py-3">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-rocket me-2"></i>Akses Cepat
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="{{ route('dokter.schedules.index') }}" class="btn btn-outline-primary w-100 text-start">
+                            <i class="fas fa-calendar-alt me-2"></i>Kelola Jadwal
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ route('dokter.appointments.index') }}" class="btn btn-outline-info w-100 text-start">
+                            <i class="fas fa-list me-2"></i>Lihat Semua Janji
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ route('dokter.medical-records.index') }}" class="btn btn-outline-warning w-100 text-start">
+                            <i class="fas fa-file-medical me-2"></i>Semua Rekam Medis
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ route('dokter.feedback.index') }}" class="btn btn-outline-success w-100 text-start">
+                            <i class="fas fa-star me-2"></i>Lihat Feedback
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{{ route('profile.edit') }}" class="btn btn-outline-secondary w-100 text-start">
+                            <i class="fas fa-user me-2"></i>Profil Saya
+                        </a>
                     </div>
                 </div>
             </div>
-
+        </div>
             <!-- Pasien Terbaru -->
             <div class="card shadow">
                 <div class="card-header bg-info text-white py-3">
