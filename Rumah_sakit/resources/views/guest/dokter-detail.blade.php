@@ -85,9 +85,9 @@
                         <div class="flex justify-between items-center bg-gray-50 rounded-lg p-4">
                             <div>
                                 <span class="font-semibold text-gray-800 capitalize">
-                                    {{ \Carbon\Carbon::create($schedule->hari)->dayName }}
+                                    {{ ucfirst($schedule->hari) }}
                                 </span>
-                                <p class="text-sm text-gray-600">{{ $schedule->jam_mulai }} - {{ $schedule->jam_selesai }}</p>
+                                <p class="text-sm text-gray-600">{{ $schedule->jam_mulai }} - {{ \Carbon\Carbon::parse($schedule->jam_mulai)->addMinutes($schedule->durasi)->format('H:i') }}</p>
                             </div>
                             <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
                                 Tersedia

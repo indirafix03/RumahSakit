@@ -16,7 +16,7 @@ class FeedbackController extends Controller
         $appointment = Appointment::with('dokter')->findOrFail($appointment_id);
         
         // Validasi 1: Hanya pemilik appointment yang bisa beri feedback
-        if ($appointment->user_id !== Auth::id()) {
+        if ($appointment->pasien_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -45,7 +45,7 @@ class FeedbackController extends Controller
         $appointment = Appointment::findOrFail($appointment_id);
 
         // Validasi authorization dan status
-        if ($appointment->user_id !== Auth::id()) {
+        if ($appointment->pasien_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -93,8 +93,9 @@ class FeedbackController extends Controller
                             ->get();
 
         $averageRating = Feedback::where('dokter_id', Auth::id())->avg('rating');
+        $totalFeedback = $feedbacks->count();
 
-        return view('dokter.feedback.index', compact('feedbacks', 'averageRating'));
+        return view('dokter.feedback.index', compact('feedbacks', 'averageRating', 'totalFeedback'));
     }
 
     // ========== UNTUK ADMIN ==========

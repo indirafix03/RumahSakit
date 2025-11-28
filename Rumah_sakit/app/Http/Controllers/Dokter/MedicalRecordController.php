@@ -73,6 +73,35 @@ class MedicalRecordController extends Controller
         return view('dokter.medical-records.create', compact('todayAppointments', 'medicines'));
     }
 
+    public function createFromAppointment($appointment_id)
+    {
+        $dokter = auth()->user();
+
+        $appointment = Appointment::with(['pasien', 'schedule'])
+            ->where('id', $appointment_id)
+            ->where('dokter_id', $dokter->id)
+            ->firstOrFail();
+
+        $todayAppointments = collect([[
+            'id' => $appointment->id,
+            'pasien' => [
+                'name' => $appointment->pasien->name,
+                'email' => $appointment->pasien->email,
+            ],
+            'tanggal_booking' => $appointment->tanggal_booking,
+            'schedule' => $appointment->schedule,
+            'keluhan_singkat' => $appointment->keluhan_singkat,
+            'display_text' => $appointment->pasien->name . ' - ' .
+                                $appointment->tanggal_booking->format('d/m/Y') . ' ' .
+                                ($appointment->schedule ? $appointment->schedule->jam_mulai : '') .
+                                ' (' . $appointment->keluhan_singkat . ')'
+        ]]);
+
+        $medicines = Medicine::where('stok', '>', 0)->get();
+
+        return view('dokter.medical-records.create', compact('todayAppointments', 'medicines'));
+    }
+
     public function store(Request $request)
 {
     $request->validate([

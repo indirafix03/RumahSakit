@@ -18,14 +18,21 @@ class GuestController extends Controller
         return view('guest.poli', compact('polis'));
     }
 
-    public function dokter()
+    public function dokter(Request $request)
     {
-        $dokters = User::where('role', 'dokter')
-            ->with('poli')
-            ->withCount(['schedules' => function($query) {
-                $query->where('hari', now()->dayOfWeek);
-            }])
-            ->get();
+        $query = User::where('role', 'dokter')
+            ->with('poli');
+
+        // Filter berdasarkan poli jika parameter ada
+        if ($request->has('poli') && $request->poli) {
+            $query->where('poli_id', $request->poli);
+        }
+
+        // Count total jadwal per dokter (bukan hanya hari ini)
+        $dokters = $query->withCount(['schedules' => function($q) {
+            // Count jadwal untuk setiap hari, tidak di-filter
+        }])
+        ->get();
 
         return view('guest.dokter', compact('dokters'));
     }

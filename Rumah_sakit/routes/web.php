@@ -77,13 +77,26 @@ Route::middleware(['auth'])->group(function () {
         // SCHEDULES
         Route::get('/dokter-schedules', [App\Http\Controllers\Dokter\ScheduleController::class, 'index'])->name('dokter.schedules.index');
         Route::post('/dokter-schedules', [App\Http\Controllers\Dokter\ScheduleController::class, 'store'])->name('dokter.schedules.store');
+        Route::get('/dokter-schedules/{schedule}/edit', [App\Http\Controllers\Dokter\ScheduleController::class, 'edit'])->name('dokter.schedules.edit');
         Route::put('/dokter-schedules/{schedule}', [App\Http\Controllers\Dokter\ScheduleController::class, 'update'])->name('dokter.schedules.update');
         Route::delete('/dokter-schedules/{schedule}', [App\Http\Controllers\Dokter\ScheduleController::class, 'destroy'])->name('dokter.schedules.destroy');
+
+        // Alias routes for backward-compatibility (accept both dashed and slash paths)
+        Route::get('/dokter/schedules', [App\Http\Controllers\Dokter\ScheduleController::class, 'index']);
+        Route::get('/dokter/schedules/{schedule}', [App\Http\Controllers\Dokter\ScheduleController::class, 'edit']);
+        Route::post('/dokter/schedules', [App\Http\Controllers\Dokter\ScheduleController::class, 'store']);
+        Route::put('/dokter/schedules/{schedule}', [App\Http\Controllers\Dokter\ScheduleController::class, 'update']);
+        Route::delete('/dokter/schedules/{schedule}', [App\Http\Controllers\Dokter\ScheduleController::class, 'destroy']);
         
         // APPOINTMENTS  
         Route::get('/dokter-appointments', [App\Http\Controllers\Dokter\AppointmentController::class, 'index'])->name('dokter.appointments.index');
         Route::get('/dokter-appointments/{appointment}', [App\Http\Controllers\Dokter\AppointmentController::class, 'show'])->name('dokter.appointments.show');
         Route::put('/dokter-appointments/{appointment}/status', [App\Http\Controllers\Dokter\AppointmentController::class, 'updateStatus'])->name('dokter.appointments.update-status');
+
+        // Alias routes for backward-compatibility (accept both dashed and slash paths)
+        Route::get('/dokter/appointments', [App\Http\Controllers\Dokter\AppointmentController::class, 'index']);
+        Route::get('/dokter/appointments/{appointment}', [App\Http\Controllers\Dokter\AppointmentController::class, 'show']);
+        Route::put('/dokter/appointments/{appointment}/status', [App\Http\Controllers\Dokter\AppointmentController::class, 'updateStatus']);
         
         // MEDICAL RECORDS
         Route::get('/dokter-medical-records', [App\Http\Controllers\Dokter\MedicalRecordController::class, 'index'])->name('dokter.medical-records.index');

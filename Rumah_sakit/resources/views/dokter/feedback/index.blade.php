@@ -65,13 +65,13 @@
                     <div class="list-group-item">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
-                                <h6 class="mb-1">{{ $feedback->patient->name }}</h6>
+                                <h6 class="mb-1">{{ $feedback->pasien->name ?? 'Tidak Diketahui' }}</h6>
                                 <small class="text-muted">
                                     {{ $feedback->created_at->translatedFormat('d F Y H:i') }}
                                 </small>
                             </div>
                             <div class="text-warning">
-                                {{ $feedback->stars }}
+                                {{ $feedback->rating ?? '-' }}
                             </div>
                         </div>
                         
@@ -83,7 +83,7 @@
 
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">
-                                Janji Temu: {{ $feedback->appointment->tanggal_booking->format('d/m/Y') }}
+                                Janji Temu: {{ ($feedback->appointment && $feedback->appointment->tanggal_booking) ? $feedback->appointment->tanggal_booking->format('d/m/Y') : '-' }}
                             </small>
                             <form action="{{ route('dokter.feedback.destroy', $feedback->id) }}" 
                                   method="POST" class="d-inline">

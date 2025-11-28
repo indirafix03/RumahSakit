@@ -54,7 +54,7 @@
                 <div class="card-footer bg-transparent">
                     <small class="text-muted">
                         Poli: {{ $feedback->dokter->poli->nama_poli ?? 'N/A' }} | 
-                        Tanggal Janji: {{ $feedback->appointment->tanggal_booking->format('d M Y') }}
+                        Tanggal Janji: {{ ($feedback->appointment && $feedback->appointment->tanggal_booking) ? $feedback->appointment->tanggal_booking->format('d M Y') : '-' }}
                     </small>
                 </div>
             </div>
