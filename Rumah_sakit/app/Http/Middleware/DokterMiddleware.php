@@ -10,12 +10,15 @@ class DokterMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Cek jika user sudah login dan role-nya dokter
+        // DEBUG: Log dulu
+        \Log::info('DokterMiddleware called for: ' . $request->path());
+        
         if (auth()->check() && auth()->user()->isDokter()) {
+            \Log::info('User is dokter: ' . auth()->user()->email);
             return $next($request);
         }
 
-        // Jika bukan dokter, redirect ke dashboard dengan pesan error
-        return redirect('/dashboard')->with('error', 'Akses ditolak. Hanya Dokter yang dapat mengakses halaman ini.');
+        \Log::info('User is NOT dokter or not logged in');
+        return redirect('/dashboard')->with('error', 'Akses ditolak.');
     }
 }

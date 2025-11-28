@@ -9,35 +9,28 @@ class Feedback extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['pasien_id', 'dokter_id', 'appointment_id', 'rating', 'ulasan'];
+    protected $table = 'feedbacks'; 
 
-    // Feedback belongs to Patient (User)
-    public function patient()
-    {
-        return $this->belongsTo(User::class, 'pasien_id');
-    }
+    protected $fillable = [
+        'pasien_id',
+        'dokter_id', 
+        'appointment_id',
+        'rating',
+        'ulasan'
+    ];
 
-    // Feedback belongs to Doctor (User)
-    public function doctor()
-    {
-        return $this->belongsTo(User::class, 'dokter_id');
-    }
-
-    // Feedback belongs to Appointment
     public function appointment()
     {
         return $this->belongsTo(Appointment::class);
     }
 
-    // Scope untuk rating tertinggi
-    public function scopeRatingTinggi($query)
+    public function dokter()
     {
-        return $query->where('rating', '>=', 4);
+        return $this->belongsTo(User::class, 'dokter_id');
     }
 
-    // Accessor untuk bintang rating
-    public function getBintangAttribute()
+    public function pasien()
     {
-        return str_repeat('⭐', $this->rating);
+        return $this->belongsTo(User::class, 'pasien_id');
     }
 }

@@ -4,18 +4,16 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class PasienMiddleware
 {
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
-        // Cek jika user sudah login dan role-nya pasien
-        if (auth()->check() && auth()->user()->isPasien()) {
+        if (Auth::check() && Auth::user()->role === 'pasien') {
             return $next($request);
         }
 
-        // Jika bukan pasien, redirect ke dashboard dengan pesan error
-        return redirect('/dashboard')->with('error', 'Akses ditolak. Hanya Pasien yang dapat mengakses halaman ini.');
+        return redirect('/')->with('error', 'Anda tidak memiliki akses ke halaman tersebut.');
     }
 }

@@ -97,4 +97,16 @@
             </div>
         </div>
     </div>
+
+    <li class="nav-item">
+        <a href="{{ route('pasien.information') }}" class="nav-link">
+            <i class="fas fa-info-circle"></i> Informasi Layanan
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="{{ route('pasien.schedules.index') }}" class="nav-link">
+            <i class="fas fa-calendar-alt"></i> Jadwal Dokter
+        </a>
+    </li>
 </nav>

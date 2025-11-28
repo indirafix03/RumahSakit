@@ -26,17 +26,16 @@
                                     id="appointment_id" name="appointment_id" required>
                                 <option value="">-- Pilih Janji Temu --</option>
                                 @foreach($todayAppointments as $appointment)
-                                    <option value="{{ $appointment->id }}" 
-                                        {{ old('appointment_id') == $appointment->id ? 'selected' : '' }}>
-                                        {{ $appointment->pasien->name }} - 
-                                        {{ $appointment->tanggal->format('d/m/Y') }} {{ $appointment->jam }}
+                                    <option value="{{ $appointment['id'] }}" 
+                                        {{ old('appointment_id') == $appointment['id'] ? 'selected' : '' }}>
+                                        {{ $appointment['display_text'] }}
                                     </option>
                                 @endforeach
                             </select>
                             @error('appointment_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            @if($todayAppointments->isEmpty())
+                            @if(count($todayAppointments) === 0)
                                 <div class="alert alert-warning mt-2">
                                     <i class="fas fa-info-circle me-2"></i>
                                     Tidak ada janji temu yang disetujui untuk hari ini.
@@ -190,15 +189,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const patientInfo = document.getElementById('patient-info');
     let itemCount = 1;
 
-    // Data janji temu untuk info pasien - SESUAIKAN DENGAN STRUKTUR TABEL
+    // Data janji temu untuk info pasien
     const appointmentsData = {
         @foreach($todayAppointments as $appointment)
-        "{{ $appointment->id }}": {
-            patientName: "{{ $appointment->pasien->name }}",
-            patientEmail: "{{ $appointment->pasien->email }}",
-            appointmentDate: "{{ $appointment->tanggal_booking->format('d/m/Y') }}", // menggunakan tanggal_booking
-            scheduleTime: "{{ $appointment->schedule ? $appointment->schedule->jam_mulai : 'N/A' }}", // dari schedule
-            keluhan: "{{ $appointment->keluhan_singkat }}" // menggunakan keluhan_singkat
+        "{{ $appointment['id'] }}": {
+            patientName: "{{ $appointment['pasien']['name'] }}",
+            patientEmail: "{{ $appointment['pasien']['email'] }}",
+            appointmentDate: "{{ $appointment['tanggal_booking']->format('d/m/Y') }}",
+            scheduleTime: "{{ $appointment['schedule'] ? $appointment['schedule']->jam_mulai : 'N/A' }}",
+            keluhan: "{{ $appointment['keluhan_singkat'] }}"
         },
         @endforeach
     };
@@ -245,31 +244,62 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRemoveButtons();
     });
 
-    // Update stok info saat obat dipilih
+    // Update stok info saat obat dipilih - PERBAIKAN
     prescriptionItems.addEventListener('change', function(e) {
         if (e.target.classList.contains('medicine-select')) {
             const selectedOption = e.target.options[e.target.selectedIndex];
-            const stok = selectedOption.getAttribute('data-stok');
+            const stok = parseInt(selectedOption.getAttribute('data-stok')); // PERBAIKAN: Konversi ke number
             const stokInfo = e.target.closest('.prescription-item').querySelector('.stok-info');
             
-            if (stok) {
+            if (!isNaN(stok)) {
                 stokInfo.textContent = `Stok tersedia: ${stok}`;
                 stokInfo.className = 'form-text stok-info small ' + (stok > 0 ? 'text-success' : 'text-danger');
+                
+                // Reset validasi quantity input
+                const quantityInput = e.target.closest('.prescription-item').querySelector('.quantity-input');
+                if (quantityInput.value) {
+                    const quantity = parseInt(quantityInput.value);
+                    if (!isNaN(quantity) && quantity > stok) {
+                        quantityInput.setCustomValidity(`Jumlah melebihi stok tersedia (${stok})`);
+                        quantityInput.classList.add('is-invalid');
+                    } else {
+                        quantityInput.setCustomValidity('');
+                        quantityInput.classList.remove('is-invalid');
+                    }
+                }
             } else {
                 stokInfo.textContent = '';
             }
         }
     });
 
-    // Validasi jumlah tidak melebihi stok
+    // Validasi jumlah tidak melebihi stok - PERBAIKAN UTAMA
     prescriptionItems.addEventListener('input', function(e) {
         if (e.target.classList.contains('quantity-input')) {
             const prescriptionItem = e.target.closest('.prescription-item');
             const select = prescriptionItem.querySelector('.medicine-select');
-            const stok = select.options[select.selectedIndex]?.getAttribute('data-stok');
-            const quantity = e.target.value;
+            const selectedOption = select.options[select.selectedIndex];
             
-            if (stok && quantity > stok) {
+            if (!selectedOption || !selectedOption.value) {
+                e.target.setCustomValidity('Pilih obat terlebih dahulu');
+                e.target.classList.add('is-invalid');
+                return;
+            }
+            
+            // PERBAIKAN: Konversi ke number
+            const stok = parseInt(selectedOption.getAttribute('data-stok'));
+            const quantity = parseInt(e.target.value);
+            
+            if (isNaN(stok) || isNaN(quantity)) {
+                e.target.setCustomValidity('Jumlah harus berupa angka');
+                e.target.classList.add('is-invalid');
+                return;
+            }
+            
+            if (quantity <= 0) {
+                e.target.setCustomValidity('Jumlah harus lebih dari 0');
+                e.target.classList.add('is-invalid');
+            } else if (quantity > stok) {
                 e.target.setCustomValidity(`Jumlah melebihi stok tersedia (${stok})`);
                 e.target.classList.add('is-invalid');
             } else {
@@ -292,20 +322,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Validasi form sebelum submit
+    // Validasi form sebelum submit - PERBAIKAN
     document.getElementById('medicalRecordForm').addEventListener('submit', function(e) {
         const medicineSelects = document.querySelectorAll('.medicine-select');
-        let hasMedicine = false;
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        let hasError = false;
         
-        medicineSelects.forEach(select => {
-            if (select.value) {
-                hasMedicine = true;
+        // Validasi setiap item resep
+        medicineSelects.forEach((select, index) => {
+            const quantityInput = quantityInputs[index];
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (!selectedOption || !selectedOption.value) {
+                hasError = true;
+                select.classList.add('is-invalid');
+            } else {
+                select.classList.remove('is-invalid');
+            }
+            
+            if (!quantityInput.value || parseInt(quantityInput.value) <= 0) {
+                hasError = true;
+                quantityInput.classList.add('is-invalid');
+            }
+            
+            // Validasi stok
+            if (selectedOption && selectedOption.value && quantityInput.value) {
+                const stok = parseInt(selectedOption.getAttribute('data-stok'));
+                const quantity = parseInt(quantityInput.value);
+                
+                if (quantity > stok) {
+                    hasError = true;
+                    quantityInput.setCustomValidity(`Jumlah melebihi stok tersedia (${stok})`);
+                    quantityInput.classList.add('is-invalid');
+                }
             }
         });
         
-        if (!hasMedicine) {
+        if (hasError) {
             e.preventDefault();
-            alert('Harap pilih minimal 1 obat untuk resep');
+            alert('Harap periksa kembali data resep obat. Pastikan semua obat terpilih dan jumlah tidak melebihi stok.');
             return false;
         }
     });

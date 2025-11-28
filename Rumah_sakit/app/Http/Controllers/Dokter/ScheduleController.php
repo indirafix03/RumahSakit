@@ -30,6 +30,15 @@ class ScheduleController extends Controller
         return view('dokter.schedules.index', compact('schedules', 'days'));
     }
 
+    public function edit(Schedule $schedule)
+    {
+        if ($schedule->dokter_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('dokter.schedules.edit', compact('schedule'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([

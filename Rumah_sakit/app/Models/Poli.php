@@ -31,4 +31,6 @@ class Poli extends Model
     {
         return $this->hasManyThrough(Schedule::class, User::class, 'poli_id', 'dokter_id');
     }
+
+    
 }
