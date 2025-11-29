@@ -11,7 +11,10 @@ class PoliController extends Controller
 {
     public function index()
     {
-        $polis = Poli::latest()->get()->map(function($poli) {
+        $polis = Poli::withCount(['doctors as doctors_count', 'appointments as appointments_count'])
+        ->latest()
+        ->get()
+        ->map(function($poli) {
             // default null
             $poli->image_url = null;
             $poli->has_image = false;

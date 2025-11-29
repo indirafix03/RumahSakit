@@ -1,125 +1,689 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Tambah Obat</h1>
-        <a href="{{ route('admin.medicines.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-            <form action="{{ route('admin.medicines.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-
-                <!-- Nama Obat -->
-                <div class="mb-3">
-                    <label class="form-label">Nama Obat <span class="text-danger">*</span></label>
-                    <input type="text" name="nama_obat" class="form-control @error('nama_obat') is-invalid @enderror"
-                           value="{{ old('nama_obat') }}" required>
-                    @error('nama_obat')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Tipe Obat -->
-                <div class="mb-3">
-                    <label class="form-label">Tipe Obat <span class="text-danger">*</span></label>
-                    <select name="tipe_obat" class="form-control @error('tipe_obat') is-invalid @enderror" required>
-                        <option value="">-- Pilih Tipe --</option>
-                        <option value="biasa" {{ old('tipe_obat') === 'biasa' ? 'selected' : '' }}>Biasa</option>
-                        <option value="keras" {{ old('tipe_obat') === 'keras' ? 'selected' : '' }}>Keras</option>
-                    </select>
-                    @error('tipe_obat')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Stok -->
-                <div class="mb-3">
-                    <label class="form-label">Stok <span class="text-danger">*</span></label>
-                    <input type="number" min="0" name="stok"
-                           class="form-control @error('stok') is-invalid @enderror"
-                           value="{{ old('stok') }}" required>
-                    @error('stok')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Deskripsi -->
-                <div class="mb-3">
-                    <label class="form-label">Deskripsi <span class="text-danger">*</span></label>
-                    <textarea name="deskripsi" rows="3"
-                              class="form-control @error('deskripsi') is-invalid @enderror"
-                              required>{{ old('deskripsi') }}</textarea>
-                    @error('deskripsi')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <!-- Gambar -->
-                <div class="mb-3">
-                    <label class="form-label">Gambar Obat <span class="text-danger">*</span></label>
-                    <input type="file" name="gambar" id="gambar" accept="image/*"
-                        class="form-control @error('gambar') is-invalid @enderror" required>
-                    <div class="form-text">Format: JPG, PNG. Maks 2MB.</div>
-                    @error('gambar') <div class="invalid-feedback">{{ $message }}</div> @enderror
-
-                    <div id="preview-container" class="mt-3" style="display:none;">
-                        <label class="form-label">Preview:</label>
-                        <div class="border p-2 text-center">
-                            <img id="preview-image" src="" class="img-fluid" style="max-height:200px; object-fit:cover;">
-                        </div>
+<div class="min-h-screen">
+    <!-- Page Content -->
+    <main>
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container position-relative">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="page-title">Tambah Obat Baru</h1>
+                        <p class="page-subtitle mb-0">Tambah data obat baru ke dalam sistem</p>
                     </div>
-                </div>
-                <div class="mb-3">
-                    <label for="expired_date" class="form-label">Tanggal Kadaluarsa</label>
-                    <input type="date" 
-                    class="form-control @error('expired_date') is-invalid @enderror" 
-                        id="expired_date" 
-                        name="expired_date" 
-                        value="{{ old('expired_date', isset($medicine) ? $medicine->expired_date?->format('Y-m-d') : '') }}"
-                        min="{{ date('Y-m-d') }}">
-                        <div class="form-text">Kosongkan jika tidak ada tanggal kadaluarsa</div>
-                        @error('expired_date')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <!-- Button -->
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Simpan
-                        </button>
-                        <a href="{{ route('admin.medicines.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Batal
+                    <div class="col-md-6 text-md-end">
+                        <a href="{{ route('admin.medicines.index') }}" class="btn btn-secondary-custom">
+                            <i class="fas fa-arrow-left me-2"></i> Kembali ke Daftar Obat
                         </a>
                     </div>
-                </form>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <div class="container">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-pills me-2"></i>
+                        Form Tambah Obat
+                    </h2>
+                </div>
+                <div class="section-body">
+                    <form action="{{ route('admin.medicines.store') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        @csrf
+
+                        <div class="row">
+                            <!-- Nama Obat -->
+                            <div class="col-md-6">
+                                <div class="form-group-custom mb-4">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-tag me-2"></i>Nama Obat
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" name="nama_obat" 
+                                           class="form-control-custom @error('nama_obat') is-invalid-custom @enderror"
+                                           value="{{ old('nama_obat') }}" 
+                                           placeholder="Masukkan nama obat" required>
+                                    @error('nama_obat')
+                                        <div class="invalid-feedback-custom">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Tipe Obat -->
+                            <div class="col-md-6">
+                                <div class="form-group-custom mb-4">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-prescription me-2"></i>Tipe Obat
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="tipe_obat" class="form-control-custom @error('tipe_obat') is-invalid-custom @enderror" required>
+                                        <option value="">-- Pilih Tipe Obat --</option>
+                                        <option value="biasa" {{ old('tipe_obat') === 'biasa' ? 'selected' : '' }}>Biasa</option>
+                                        <option value="keras" {{ old('tipe_obat') === 'keras' ? 'selected' : '' }}>Keras</option>
+                                    </select>
+                                    @error('tipe_obat')
+                                        <div class="invalid-feedback-custom">{{ $message }}</div>
+                                    @enderror
+                                    <div class="form-help-text">
+                                        Pilih tipe obat sesuai dengan klasifikasi
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Stok -->
+                            <div class="col-md-6">
+                                <div class="form-group-custom mb-4">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-boxes me-2"></i>Stok Awal
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" min="0" name="stok"
+                                           class="form-control-custom @error('stok') is-invalid-custom @enderror"
+                                           value="{{ old('stok') }}" 
+                                           placeholder="Masukkan jumlah stok" required>
+                                    @error('stok')
+                                        <div class="invalid-feedback-custom">{{ $message }}</div>
+                                    @enderror
+                                    <div class="form-help-text">
+                                        Masukkan jumlah stok awal obat
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tanggal Kadaluarsa -->
+                            <div class="col-md-6">
+                                <div class="form-group-custom mb-4">
+                                    <label for="expired_date" class="form-label-custom">
+                                        <i class="fas fa-calendar-times me-2"></i>Tanggal Kadaluarsa
+                                    </label>
+                                    <input type="date" 
+                                           class="form-control-custom @error('expired_date') is-invalid-custom @enderror" 
+                                           id="expired_date" 
+                                           name="expired_date" 
+                                           value="{{ old('expired_date') }}"
+                                           min="{{ date('Y-m-d') }}">
+                                    @error('expired_date')
+                                        <div class="invalid-feedback-custom">{{ $message }}</div>
+                                    @enderror
+                                    <div class="form-help-text">
+                                        Kosongkan jika tidak ada tanggal kadaluarsa
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Deskripsi -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group-custom mb-4">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-align-left me-2"></i>Deskripsi Obat
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea name="deskripsi" rows="4"
+                                              class="form-control-custom @error('deskripsi') is-invalid-custom @enderror"
+                                              placeholder="Deskripsi lengkap tentang obat, indikasi, dosis, dan informasi penting lainnya..."
+                                              required>{{ old('deskripsi') }}</textarea>
+                                    @error('deskripsi')
+                                        <div class="invalid-feedback-custom">{{ $message }}</div>
+                                    @enderror
+                                    <div class="form-help-text">
+                                        Jelaskan secara detail tentang obat, termasuk indikasi, dosis, dan peringatan
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gambar Obat -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group-custom mb-4">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-image me-2"></i>Gambar Obat
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="file-upload-wrapper">
+                                        <input type="file" name="gambar" id="gambar" accept="image/*"
+                                               class="file-upload-input @error('gambar') is-invalid-custom @enderror" required>
+                                        <div class="file-upload-area" id="file-upload-area">
+                                            <div class="file-upload-content">
+                                                <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                                                <p class="file-upload-text">Klik untuk memilih gambar atau drag & drop di sini</p>
+                                                <p class="file-upload-subtext">Format: JPG, PNG, JPEG. Maksimal 2MB.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @error('gambar') 
+                                        <div class="invalid-feedback-custom">{{ $message }}</div> 
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div class="row" id="preview-container" style="display: none;">
+                            <div class="col-12">
+                                <div class="image-preview-container">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-eye me-2"></i>Preview Gambar
+                                    </label>
+                                    <div class="image-preview">
+                                        <img id="preview-image" src="" class="preview-image">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-3">
+                                    <a href="{{ route('admin.medicines.index') }}" class="btn btn-secondary-custom">
+                                        <i class="fas fa-times me-2"></i>Batal
+                                    </a>
+                                    <button type="submit" class="btn btn-primary-custom">
+                                        <i class="fas fa-save me-2"></i>Simpan Obat Baru
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 
+<style>
+:root {
+    --primary-text: #094fa4;
+    --secondary-color: #0065c1;
+    --card-color: #009ee5;
+    --background-color: #52bcec;
+    --light-bg: #f8f9fa;
+    --dark-text: #2c3e50;
+    --light-text: #7f8c8d;
+    --white: #ffffff;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+}
+
+body {
+    font-family: 'Oswald', sans-serif;
+    color: var(--primary-text);
+    line-height: 1.6;
+    font-weight: 400;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e6f3ff 100%);
+    min-height: 100vh;
+}
+
+.admin-navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, var(--primary-text) 0%, var(--secondary-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    font-weight: 500;
+    color: var(--primary-text);
+    margin: 0 0.5rem;
+    letter-spacing: 0.5px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--card-color) 100%);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 100%;
+}
+
+.nav-link.active {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.btn-logout {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
+    color: var(--white);
+    border: none;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.btn-logout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+}
+
+.page-header {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--card-color) 100%);
+    color: var(--white);
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="rgba(255,255,255,0.1)"><polygon points="0,0 1000,50 1000,100 0,100"/></svg>');
+    background-size: cover;
+}
+
+.page-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative;
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+/* Section Cards */
+.section-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 
+        0 8px 32px rgba(0, 101, 193, 0.1),
+        0 2px 8px rgba(0, 101, 193, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.section-card:hover {
+    box-shadow: 
+        0 12px 40px rgba(0, 101, 193, 0.15),
+        0 4px 12px rgba(0, 101, 193, 0.1);
+}
+
+.section-header {
+    background: linear-gradient(135deg, rgba(0, 101, 193, 0.05) 0%, rgba(0, 158, 229, 0.05) 100%);
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--primary-text);
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+}
+
+.section-body {
+    padding: 2rem;
+}
+
+/* Button Styles */
+.btn-primary-custom {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--card-color) 100%);
+    color: var(--white);
+    border: none;
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 101, 193, 0.2);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.btn-primary-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 101, 193, 0.3);
+    color: var(--white);
+}
+
+.btn-secondary-custom {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--primary-text);
+    border: 1px solid rgba(0, 101, 193, 0.2);
+    padding: 0.8rem 2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.btn-secondary-custom:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 101, 193, 0.1);
+    color: var(--primary-text);
+}
+
+/* Form Styles */
+.form-group-custom {
+    position: relative;
+}
+
+.form-label-custom {
+    font-weight: 600;
+    color: var(--primary-text);
+    margin-bottom: 0.5rem;
+    display: block;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.form-label-custom .text-danger {
+    color: var(--danger-color) !important;
+}
+
+.form-control-custom {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 101, 193, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    font-family: 'Oswald', sans-serif;
+}
+
+.form-control-custom:focus {
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(0, 101, 193, 0.1);
+    outline: none;
+}
+
+.form-control-custom::placeholder {
+    color: var(--light-text);
+    opacity: 0.7;
+}
+
+/* Textarea specific */
+.form-control-custom textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Invalid State */
+.is-invalid-custom {
+    border-color: var(--danger-color);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.is-invalid-custom:focus {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.invalid-feedback-custom {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+/* Form Help Text */
+.form-help-text {
+    font-size: 0.8rem;
+    color: var(--light-text);
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
+/* Select Arrow */
+.form-control-custom select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230065c1' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 16px 12px;
+    padding-right: 2.5rem;
+}
+
+/* File Upload Styles */
+.file-upload-wrapper {
+    position: relative;
+}
+
+.file-upload-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.file-upload-area {
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px dashed rgba(0, 101, 193, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.file-upload-area:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: var(--secondary-color);
+}
+
+.file-upload-area.dragover {
+    background: rgba(0, 101, 193, 0.05);
+    border-color: var(--secondary-color);
+    border-style: solid;
+}
+
+.file-upload-icon {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+
+.file-upload-text {
+    font-weight: 600;
+    color: var(--primary-text);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.file-upload-subtext {
+    color: var(--light-text);
+    font-size: 0.85rem;
+    margin-bottom: 0;
+}
+
+/* Image Preview */
+.image-preview-container {
+    margin-top: 1rem;
+}
+
+.image-preview {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 101, 193, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 1.8rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    .btn-primary-custom,
+    .btn-secondary-custom {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .section-body {
+        padding: 1.5rem;
+    }
+    
+    .file-upload-area {
+        padding: 1.5rem;
+    }
+    
+    .file-upload-icon {
+        font-size: 2rem;
+    }
+    
+    .image-preview {
+        padding: 1rem;
+        min-height: 150px;
+    }
+}
+</style>
 
 <script>
-document.getElementById('gambar').addEventListener('change', function(e) {
-    const file = e.target.files[0];
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('gambar');
+    const fileUploadArea = document.getElementById('file-upload-area');
     const previewContainer = document.getElementById('preview-container');
     const previewImage = document.getElementById('preview-image');
 
-    if (!file) {
-        previewContainer.style.display = 'none';
-        previewImage.src = '';
-        return;
+    // Drag and drop functionality
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelect(e.dataTransfer.files[0]);
+        }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            handleFileSelect(this.files[0]);
+        } else {
+            resetFileUpload();
+        }
+    });
+
+    // Handle file selection
+    function handleFileSelect(file) {
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                previewImage.src = ev.target.result;
+                previewContainer.style.display = 'block';
+                
+                // Update upload area text
+                const uploadContent = fileUploadArea.querySelector('.file-upload-content');
+                uploadContent.innerHTML = `
+                    <i class="fas fa-check-circle file-upload-icon text-success"></i>
+                    <p class="file-upload-text">File selected: ${file.name}</p>
+                    <p class="file-upload-subtext">Size: ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                `;
+            }
+            reader.readAsDataURL(file);
+        }
     }
 
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-        previewImage.src = ev.target.result;
-        previewContainer.style.display = 'block';
+    // Reset file upload area
+    function resetFileUpload() {
+        previewContainer.style.display = 'none';
+        previewImage.src = '';
+        
+        const uploadContent = fileUploadArea.querySelector('.file-upload-content');
+        uploadContent.innerHTML = `
+            <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+            <p class="file-upload-text">Klik untuk memilih gambar atau drag & drop di sini</p>
+            <p class="file-upload-subtext">Format: JPG, PNG, JPEG. Maksimal 2MB.</p>
+        `;
     }
-    reader.readAsDataURL(file);
+
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
 });
 </script>
 @endsection

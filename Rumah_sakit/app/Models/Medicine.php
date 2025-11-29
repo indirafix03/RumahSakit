@@ -83,6 +83,7 @@ class Medicine extends Model
             return [
                 'status' => 'kadaluarsa',
                 'color' => 'danger',
+                'icon' => 'fa-skull-crossbones',
                 'label' => 'Kadaluarsa',
                 'reason' => 'Tanggal kadaluarsa sudah lewat ' . abs($daysUntilExpired) . ' hari yang lalu',
                 'days_until_expired' => $daysUntilExpired
@@ -94,6 +95,7 @@ class Medicine extends Model
             return [
                 'status' => 'hampir_kadaluarsa',
                 'color' => 'warning',
+                'icon' => 'fa-exclamation-triangle',
                 'label' => 'Hampir Kadaluarsa',
                 'reason' => 'Akan kadaluarsa dalam ' . $daysUntilExpired . ' hari',
                 'days_until_expired' => $daysUntilExpired
@@ -115,6 +117,7 @@ class Medicine extends Model
             return [
                 'status' => 'tersedia',
                 'color' => 'success',
+                'icon' => 'fa-check-circle',
                 'label' => 'Tersedia',
                 'reason' => 'Stok mencukupi'
             ];
@@ -122,6 +125,7 @@ class Medicine extends Model
             return [
                 'status' => 'terbatas',
                 'color' => 'warning',
+                'icon' => 'fa-exclamation-circle',
                 'label' => 'Stok Terbatas',
                 'reason' => 'Stok hampir habis'
             ];
@@ -129,6 +133,7 @@ class Medicine extends Model
             return [
                 'status' => 'habis',
                 'color' => 'secondary',
+                'icon' => 'fa-times-circle',
                 'label' => 'Stok Habis',
                 'reason' => 'Tidak ada stok'
             ];

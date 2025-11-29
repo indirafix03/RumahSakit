@@ -101,4 +101,56 @@ class User extends Authenticatable
     {
         return $this->role === 'pasien';
     }
+
+    // Tambahkan method ini di model User jika belum ada
+
+/**
+ * Get formatted phone number
+ */
+    public function getFormattedPhoneAttribute()
+    {
+        if (!$this->no_telepon) {
+            return null;
+        }
+        
+        // Format phone number for display
+        $phone = $this->no_telepon;
+        if (str_starts_with($phone, '+62')) {
+            $phone = '0' . substr($phone, 3);
+        }
+        
+        return $phone;
+    }
+
+    /**
+     * Get short bio (truncated)
+     */
+    public function getShortBioAttribute()
+    {
+        if (!$this->bio) {
+            return null;
+        }
+        
+        return \Illuminate\Support\Str::limit($this->bio, 120);
+    }
+
+    /**
+     * Check if user has complete profile
+     */
+    public function getHasCompleteProfileAttribute()
+    {
+        $requiredFields = ['name', 'email'];
+        
+        if ($this->isDokter()) {
+            $requiredFields[] = 'spesialisasi';
+        }
+        
+        foreach ($requiredFields as $field) {
+            if (empty($this->$field)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 }

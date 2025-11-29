@@ -1,35 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-2">Manajemen Janji Temu</h1>
-            <p class="text-muted">Kelola semua janji temu pasien</p>
-        </div>
-        <div class="text-end">
-            <button type="button" class="btn btn-primary" onclick="loadStatistics()">
-                <i class="fas fa-chart-bar me-2"></i>Lihat Statistik
-            </button>
-        </div>
-    </div>
-
-    <!-- Statistik Cards -->
-    <div class="row mb-4" id="statsContainer" style="display: none;">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistik Janji Temu</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row" id="statsContent">
-                        <!-- Stats will be loaded here -->
+<div class="min-h-screen">
+    <main>
+        <!-- Page Header (match admin dashboard style) -->
+        <div class="page-header">
+            <div class="container position-relative">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="page-title">Manajemen Janji Temu</h1>
+                        <p class="page-subtitle mb-0">Kelola semua janji temu pasien dengan mudah</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <button type="button" class="btn btn-primary-custom" onclick="loadStatistics()">
+                            <i class="fas fa-chart-bar me-2"></i> Lihat Statistik
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- Stats Section (hidden until loaded) -->
+        <div id="statsContainer" class="section-card mb-4" style="display:none;">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-chart-bar me-2"></i>Statistik Janji Temu</h2>
+            </div>
+            <div class="section-body">
+                <div class="row g-4" id="statsContent"></div>
+            </div>
+        </div>
 
     <!-- Filter Section -->
     <div class="card mb-4">

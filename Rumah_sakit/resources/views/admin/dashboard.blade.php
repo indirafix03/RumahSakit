@@ -1,25 +1,19 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@extends('layouts.app')
 
-    <title>Admin Dashboard - {{ config('app.name', 'Laravel') }}</title>
+@section('content')
+<div class="min-h-screen">
+    <main>
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container position-relative">
+                <h1 class="page-title">Admin Dashboard</h1>
+                <p class="page-subtitle mb-0">Overview sistem dan monitoring real-time</p>
+            </div>
+        </div>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Custom Styles -->
-    <style>
+        <div class="container">
+            <!-- Elegant Stats Cards -->
+        <style>
         :root {
             --primary-text: #094fa4;
             --secondary-color: #0065c1;
@@ -511,56 +505,7 @@
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen">
-        <!-- Admin Navigation -->
-        <nav class="admin-navbar navbar navbar-expand-lg sticky-top">
-            <div class="container">
-                <a class="navbar-brand" href="/admin/dashboard">
-                    {{ config('app.name', 'MedicalSystem') }} - Admin
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="adminNavbar">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}" href="/admin/dashboard">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}" href="/admin/users">Users</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('admin/polis*') ? 'active' : '' }}" href="/admin/polis">Poli</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('admin/medicines*') ? 'active' : '' }}" href="/admin/medicines">Obat</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('admin/appointments*') ? 'active' : '' }}" href="/admin/appointments">Janji Temu</a>
-                        </li>
-                    </ul>
-                    <div class="d-flex align-items-center">
-                        <span class="me-3 fw-medium">{{ Auth::user()->name ?? 'Admin' }}</span>
-                        <form method="POST" action="/logout">
-                            @csrf
-                            <button class="btn btn-logout">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Page Content -->
         <main>
-            <!-- Page Header -->
-            <div class="page-header">
-                <div class="container position-relative">
-                    <h1 class="page-title">Admin Dashboard</h1>
-                    <p class="mb-0 fs-5 opacity-90">Overview sistem dan monitoring real-time</p>
-                </div>
-            </div>
-
             <div class="container">
                 <!-- Elegant Stats Cards -->
                 <div class="stats-grid">
@@ -570,19 +515,19 @@
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="stats-content">
-                            <div class="stats-number">{{ $userStats['total_users'] }}</div>
+                            <div class="stats-number">{{ $userStats['total_users'] ?? 0 }}</div>
                             <div class="stats-label">Total Pengguna</div>
                             <div class="stats-details">
                                 <div class="stats-detail-item">
-                                    <div class="detail-number text-info">{{ $userStats['total_admin'] }}</div>
+                                    <div class="detail-number text-info">{{ $userStats['total_admin'] ?? 0 }}</div>
                                     <div class="detail-label">Admin</div>
                                 </div>
                                 <div class="stats-detail-item">
-                                    <div class="detail-number text-primary">{{ $userStats['total_dokter'] }}</div>
+                                    <div class="detail-number text-primary">{{ $userStats['total_dokter'] ?? 0 }}</div>
                                     <div class="detail-label">Dokter</div>
                                 </div>
                                 <div class="stats-detail-item">
-                                    <div class="detail-number text-success">{{ $userStats['total_pasien'] }}</div>
+                                    <div class="detail-number text-success">{{ $userStats['total_pasien'] ?? 0 }}</div>
                                     <div class="detail-label">Pasien</div>
                                 </div>
                             </div>
@@ -595,19 +540,19 @@
                             <i class="fas fa-clock"></i>
                         </div>
                         <div class="stats-content">
-                            <div class="stats-number">{{ $appointmentStats['pending_appointments'] }}</div>
+                            <div class="stats-number">{{ $appointmentStats['pending_appointments'] ?? 0 }}</div>
                             <div class="stats-label">Appointments Pending</div>
                             <div class="stats-details">
                                 <div class="stats-detail-item">
-                                    <div class="detail-number">{{ $appointmentStats['pending_appointments'] }}</div>
+                                    <div class="detail-number">{{ $appointmentStats['pending_appointments'] ?? 0 }}</div>
                                     <div class="detail-label">Menunggu</div>
                                 </div>
                                 <div class="stats-detail-item">
-                                    <div class="detail-number">{{ $appointmentStats['total_appointments'] - $appointmentStats['pending_appointments'] }}</div>
+                                    <div class="detail-number">{{ ($appointmentStats['total_appointments'] ?? 0) - ($appointmentStats['pending_appointments'] ?? 0) }}</div>
                                     <div class="detail-label">Disetujui</div>
                                 </div>
                                 <div class="stats-detail-item">
-                                    <div class="detail-number">{{ $appointmentStats['total_appointments'] }}</div>
+                                    <div class="detail-number">{{ $appointmentStats['total_appointments'] ?? 0 }}</div>
                                     <div class="detail-label">Total</div>
                                 </div>
                             </div>
@@ -620,15 +565,15 @@
                             <i class="fas fa-pills"></i>
                         </div>
                         <div class="stats-content">
-                            <div class="stats-number">{{ $medicineStats['total_obat'] }}</div>
+                            <div class="stats-number">{{ $medicineStats['total_obat'] ?? 0 }}</div>
                             <div class="stats-label">Total Obat</div>
                             <div class="stats-details">
                                 <div class="stats-detail-item">
-                                    <div class="detail-number text-success">{{ $medicineStats['obat_tersedia'] }}</div>
+                                    <div class="detail-number text-success">{{ $medicineStats['obat_tersedia'] ?? 0 }}</div>
                                     <div class="detail-label">Tersedia</div>
                                 </div>
                                 <div class="stats-detail-item">
-                                    <div class="detail-number text-warning">{{ $medicineStats['obat_habis'] }}</div>
+                                    <div class="detail-number text-warning">{{ $medicineStats['obat_habis'] ?? 0 }}</div>
                                     <div class="detail-label">Habis</div>
                                 </div>
                                 <div class="stats-detail-item">
@@ -647,7 +592,7 @@
                             <i class="fas fa-user-md"></i>
                         </div>
                         <div class="stats-content">
-                            <div class="stats-number">{{ $dokterBertugasHariIni->count() }}</div>
+                            <div class="stats-number">{{ $dokterBertugasHariIni->count() ?? 0 }}</div>
                             <div class="stats-label">Dokter Bertugas</div>
                             <div class="stats-details">
                                 <div class="stats-detail-item">
@@ -669,7 +614,7 @@
                     </div>
                 </div>
 
-                <!-- Dokter Bertugas Hari Ini & Distribusi Pengguna -->
+                <!-- Dokter Bertugas Hari Ini & Pending Appointments -->
                 <div class="row g-4 mb-5">
                     <!-- Dokter yang Sedang Bertugas Hari Ini -->
                     <div class="col-lg-6">
@@ -678,11 +623,11 @@
                                 <h2 class="section-title">
                                     <i class="fas fa-user-md text-info me-2"></i>
                                     Dokter Bertugas Hari Ini
-                                    <span class="section-badge">{{ $dokterBertugasHariIni->count() }} dokter</span>
+                                    <span class="section-badge">{{ $dokterBertugasHariIni->count() ?? 0 }} dokter</span>
                                 </h2>
                             </div>
                             <div class="section-body">
-                                @if($dokterBertugasHariIni->count() > 0)
+                                @if($dokterBertugasHariIni && $dokterBertugasHariIni->count() > 0)
                                     <div class="row g-3">
                                         @foreach($dokterBertugasHariIni as $dokter)
                                             <div class="col-12">
@@ -699,27 +644,12 @@
                                                                 {{ $dokter->email }}
                                                             </p>
                                                             
-                                                            @if($dokter->total_appointments_today > 0)
+                                                            @if(($dokter->total_appointments_today ?? 0) > 0)
                                                                 <div class="mt-2">
                                                                     <span class="badge bg-success appointment-badge">
                                                                         <i class="fas fa-calendar-check me-1"></i>
                                                                         {{ $dokter->total_appointments_today }} appointment hari ini
                                                                     </span>
-                                                                    <div class="mt-1">
-                                                                        @foreach($dokter->appointments_today->take(2) as $appointment)
-                                                                            <small class="text-muted d-block">
-                                                                                • {{ $appointment->pasien->name }} 
-                                                                                @if($appointment->schedule)
-                                                                                    ({{ \Carbon\Carbon::parse($appointment->schedule->jam_mulai)->format('H:i') }})
-                                                                                @endif
-                                                                            </small>
-                                                                        @endforeach
-                                                                        @if($dokter->total_appointments_today > 2)
-                                                                            <small class="text-muted">
-                                                                                • dan {{ $dokter->total_appointments_today - 2 }} lainnya...
-                                                                            </small>
-                                                                        @endif
-                                                                    </div>
                                                                 </div>
                                                             @else
                                                                 <span class="badge bg-secondary appointment-badge">
@@ -729,7 +659,7 @@
                                                             @endif
                                                         </div>
                                                         
-                                                        @if($dokter->total_appointments_today > 0)
+                                                        @if(($dokter->total_appointments_today ?? 0) > 0)
                                                             <span class="badge bg-success">
                                                                 <i class="fas fa-check-circle me-1"></i>
                                                                 Bertugas
@@ -757,110 +687,63 @@
                         </div>
                     </div>
 
-                    <!-- Distribusi Pengguna Berdasarkan Peran -->
+                    <!-- Pending Appointments untuk Approval -->
                     <div class="col-lg-6">
                         <div class="section-card">
                             <div class="section-header">
                                 <h2 class="section-title">
-                                    <i class="fas fa-chart-pie text-primary me-2"></i>
-                                    Distribusi Pengguna Berdasarkan Peran
+                                    <i class="fas fa-clock text-warning me-2"></i>
+                                    Pending Appointments Menunggu Approval
+                                    @if($pendingAppointments && $pendingAppointments->count() > 0)
+                                        <span class="section-badge">{{ $pendingAppointments->count() }} appointments</span>
+                                    @endif
                                 </h2>
                             </div>
                             <div class="section-body">
-                                <div class="row g-3 mb-4">
-                                    <!-- Admin -->
-                                    <div class="col-12">
-                                        <div class="role-card bg-primary bg-opacity-10">
-                                            <div class="d-flex align-items-center">
-                                                <div class="role-icon bg-primary text-white">
-                                                    <i class="fas fa-cog"></i>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <h5 class="mb-1">Admin</h5>
-                                                    <p class="mb-0 text-muted">System Administrator</p>
-                                                </div>
-                                                <div class="text-end">
-                                                    <div class="role-count text-primary">{{ $userStats['total_admin'] }}</div>
-                                                    <div class="role-percentage">
-                                                        @if($userStats['total_users'] > 0)
-                                                            {{ number_format(($userStats['total_admin'] / $userStats['total_users']) * 100, 1) }}%
-                                                        @else
-                                                            0%
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                @if($pendingAppointments && $pendingAppointments->count() > 0)
+                                    <div class="table-responsive">
+                                        <table class="table table-custom table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Pasien</th>
+                                                    <th>Dokter</th>
+                                                    <th>Poli</th>
+                                                    <th>Tanggal</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($pendingAppointments as $appointment)
+                                                <tr>
+                                                    <td>
+                                                        <div class="fw-bold">{{ $appointment->pasien->name ?? 'N/A' }}</div>
+                                                        <small class="text-muted">{{ $appointment->pasien->email ?? 'N/A' }}</small>
+                                                    </td>
+                                                    <td class="fw-bold">Dr. {{ $appointment->dokter->name ?? 'N/A' }}</td>
+                                                    <td>
+                                                        <span class="badge bg-primary">
+                                                            {{ $appointment->dokter->poli->nama_poli ?? 'N/A' }}
+                                                        </span>
+                                                    </td>
+                                                    <td>{{ $appointment->tanggal_booking->format('d M Y') ?? 'N/A' }}</td>
+                                                    <td>
+                                                        <a href="{{ route('admin.appointments.show', $appointment) }}" class="btn btn-sm btn-primary">
+                                                            Review
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
-
-                                    <!-- Dokter -->
-                                    <div class="col-12">
-                                        <div class="role-card bg-info bg-opacity-10">
-                                            <div class="d-flex align-items-center">
-                                                <div class="role-icon bg-info text-white">
-                                                    <i class="fas fa-user-md"></i>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <h5 class="mb-1">Dokter</h5>
-                                                    <p class="mb-0 text-muted">Medical Practitioners</p>
-                                                </div>
-                                                <div class="text-end">
-                                                    <div class="role-count text-info">{{ $userStats['total_dokter'] }}</div>
-                                                    <div class="role-percentage">
-                                                        @if($userStats['total_users'] > 0)
-                                                            {{ number_format(($userStats['total_dokter'] / $userStats['total_users']) * 100, 1) }}%
-                                                        @else
-                                                            0%
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </div>
+                                @else
+                                    <div class="empty-state">
+                                        <div class="empty-icon">
+                                            <i class="fas fa-check-circle"></i>
                                         </div>
+                                        <p class="empty-text">Tidak ada appointment yang menunggu approval</p>
                                     </div>
-
-                                    <!-- Pasien -->
-                                    <div class="col-12">
-                                        <div class="role-card bg-success bg-opacity-10">
-                                            <div class="d-flex align-items-center">
-                                                <div class="role-icon bg-success text-white">
-                                                    <i class="fas fa-user-injured"></i>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <h5 class="mb-1">Pasien</h5>
-                                                    <p class="mb-0 text-muted">Patients</p>
-                                                </div>
-                                                <div class="text-end">
-                                                    <div class="role-count text-success">{{ $userStats['total_pasien'] }}</div>
-                                                    <div class="role-percentage">
-                                                        @if($userStats['total_users'] > 0)
-                                                            {{ number_format(($userStats['total_pasien'] / $userStats['total_users']) * 100, 1) }}%
-                                                        @else
-                                                            0%
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Summary -->
-                                <div class="bg-light rounded p-3">
-                                    <div class="row text-center">
-                                        <div class="col-4">
-                                            <div class="text-primary fw-bold fs-4">{{ $userStats['total_admin'] }}</div>
-                                            <small class="text-muted">Admin</small>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="text-info fw-bold fs-4">{{ $userStats['total_dokter'] }}</div>
-                                            <small class="text-muted">Dokter</small>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="text-success fw-bold fs-4">{{ $userStats['total_pasien'] }}</div>
-                                            <small class="text-muted">Pasien</small>
-                                        </div>
-                                    </div>
-                                </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -912,80 +795,17 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Pending Appointments untuk Approval -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="section-card">
-                            <div class="section-header">
-                                <h2 class="section-title">
-                                    <i class="fas fa-clock text-warning me-2"></i>
-                                    Pending Appointments Menunggu Approval
-                                    @if($pendingAppointments->count() > 0)
-                                        <span class="section-badge">{{ $pendingAppointments->count() }} appointments</span>
-                                    @endif
-                                </h2>
-                            </div>
-                            <div class="section-body">
-                                @if($pendingAppointments->count() > 0)
-                                    <div class="table-responsive">
-                                        <table class="table table-custom table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Pasien</th>
-                                                    <th>Dokter</th>
-                                                    <th>Poli</th>
-                                                    <th>Keluhan</th>
-                                                    <th>Tanggal</th>
-                                                    <th>Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($pendingAppointments as $appointment)
-                                                <tr>
-                                                    <td>
-                                                        <div class="fw-bold">{{ $appointment->pasien->name }}</div>
-                                                        <small class="text-muted">{{ $appointment->pasien->email }}</small>
-                                                    </td>
-                                                    <td class="fw-bold">Dr. {{ $appointment->dokter->name }}</td>
-                                                    <td>
-                                                        <span class="badge bg-primary">
-                                                            {{ $appointment->dokter->poli->nama_poli ?? 'N/A' }}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="text-truncate" style="max-width: 200px;" title="{{ $appointment->keluhan_singkat }}">
-                                                            {{ $appointment->keluhan_singkat }}
-                                                        </div>
-                                                    </td>
-                                                    <td>{{ $appointment->tanggal_booking->format('d M Y') }}</td>
-                                                    <td>
-                                                        <a href="{{ route('admin.appointments.show', $appointment) }}" class="btn btn-sm btn-primary">
-                                                            Review
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @else
-                                    <div class="empty-state">
-                                        <div class="empty-icon">
-                                            <i class="fas fa-check-circle"></i>
-                                        </div>
-                                        <p class="empty-text">Tidak ada appointment yang menunggu approval</p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </main>
     </div>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        </div>
+    </main>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    // Dashboard scripts if needed
+</script>
+@endpush
