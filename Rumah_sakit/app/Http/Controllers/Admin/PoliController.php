@@ -30,6 +30,23 @@ class PoliController extends Controller
         return view('admin.polis.index', compact('polis'));
     }
 
+    public function show(Poli $poli)
+    {
+        // Load doctor and appointment relationships
+        $poli->load(['doctors', 'appointments']);
+        
+        // Add image URL and has_image flag
+        $poli->image_url = null;
+        $poli->has_image = false;
+
+        if (!empty($poli->ikon) && Storage::disk('public')->exists($poli->ikon)) {
+            $poli->image_url = Storage::url($poli->ikon);
+            $poli->has_image = true;
+        }
+
+        return view('admin.polis.show', compact('poli'));
+    }
+
     public function create()
     {
         return view('admin.polis.create');

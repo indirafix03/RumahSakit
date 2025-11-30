@@ -2,46 +2,6 @@
 
 @section('content')
 <div class="min-h-screen">
-    <!-- Admin Navigation -->
-    <nav class="admin-navbar navbar navbar-expand-lg sticky-top">
-        <div class="container">
-            <a class="navbar-brand" href="/admin/dashboard">
-                {{ config('app.name', 'MedicalSystem') }} - Admin
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="adminNavbar">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/admin/users">Users</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/polis">Poli</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/medicines">Obat</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/appointments">Janji Temu</a>
-                    </li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <span class="me-3 fw-medium">{{ Auth::user()->name ?? 'Admin' }}</span>
-                    <form method="POST" action="/logout">
-                        @csrf
-                        <button class="btn btn-logout">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </nav>
-
     <!-- Page Content -->
     <main>
         <!-- Page Header -->

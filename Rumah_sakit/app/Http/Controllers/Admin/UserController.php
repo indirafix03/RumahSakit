@@ -12,9 +12,25 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('poli')->latest()->paginate(10);
+        $query = User::with('poli');
+
+        // Apply search filter (name or email)
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply role filter
+        if ($request->filled('role')) {
+            $query->where('role', $request->input('role'));
+        }
+
+        $users = $query->latest()->paginate(10)->appends($request->query());
         return view('admin.users.index', compact('users'));
     }
 
