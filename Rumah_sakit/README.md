@@ -1,59 +1,187 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Manajemen Rumah Sakit
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem manajemen rumah sakit berbasis web yang dibangun dengan Laravel untuk mengelola operasional rumah sakit secara efisien. Sistem ini dirancang untuk memfasilitasi interaksi antara pasien, dokter, dan administrator rumah sakit.
 
-## About Laravel
+## 🚀 Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 👥 Manajemen Pengguna
+- **Admin**: Mengelola pengguna, poli, obat, dan data rumah sakit
+- **Dokter**: Mengelola jadwal, janji temu, dan rekam medis
+- **Pasien**: Membuat janji temu, melihat rekam medis, dan memberikan feedback
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 📅 Sistem Janji Temu (Appointments)
+- Pembuatan janji temu online
+- Manajemen status janji temu (pending, confirmed, completed, cancelled)
+- Integrasi dengan jadwal dokter
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🏥 Manajemen Rekam Medis
+- Pembuatan dan pengelolaan rekam medis pasien
+- Riwayat pengobatan lengkap
+- Akses terbatas berdasarkan role
 
-## Learning Laravel
+### 💊 Sistem Resep Obat
+- Manajemen obat dan stok
+- Pembuatan resep digital
+- Konfirmasi pengambilan obat
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 📊 Dashboard dan Laporan
+- Dashboard khusus untuk setiap role
+- Statistik janji temu dan aktivitas
+- Sistem feedback dari pasien
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🔐 Sistem Keamanan
+- Autentikasi dan autorisasi berbasis role
+- Middleware untuk proteksi route
+- Enkripsi data sensitif
 
-## Laravel Sponsors
+## 🛠️ Teknologi yang Digunakan
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Backend**: Laravel 12.x
+- **Frontend**: Blade Templates, Tailwind CSS
+- **Database**: MySQL
+- **Authentication**: Laravel Breeze
+- **JavaScript**: Alpine.js
+- **Build Tool**: Vite
 
-### Premium Partners
+## 📋 Persyaratan Sistem
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- PHP >= 8.2
+- Composer
+- Node.js & NPM
+- MySQL atau database yang kompatibel
+- Web server (Apache/Nginx)
 
-## Contributing
+## 🚀 Instalasi
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **Clone repository**
+   ```bash
+   git clone <repository-url>
+   cd rumah-sakit
+   ```
 
-## Code of Conduct
+2. **Install dependencies PHP**
+   ```bash
+   composer install
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+3. **Install dependencies JavaScript**
+   ```bash
+   npm install
+   ```
 
-## Security Vulnerabilities
+4. **Konfigurasi environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5. **Konfigurasi database**
+   - Buat database baru di MySQL
+   - Update file `.env` dengan kredensial database
 
-## License
+6. **Jalankan migrasi dan seeder**
+   ```bash
+   php artisan migrate
+   php artisan db:seed
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+7. **Build assets**
+   ```bash
+   npm run build
+   ```
+
+8. **Jalankan aplikasi**
+   ```bash
+   php artisan serve
+   ```
+
+## 📖 Penggunaan
+
+### Akses Sistem
+- **Guest**: Dapat melihat informasi poli dan dokter tanpa login
+- **Admin**: Login untuk mengakses panel admin di `/admin/dashboard`
+- **Dokter**: Login untuk mengakses panel dokter di `/dokter-dashboard`
+- **Pasien**: Login untuk mengakses panel pasien di `/pasien/dashboard`
+
+### Fitur Utama
+1. **Pendaftaran Akun**: Pasien dapat mendaftar akun baru
+2. **Membuat Janji Temu**: Pilih poli, dokter, dan waktu yang tersedia
+3. **Manajemen Jadwal**: Dokter dapat mengatur jadwal praktik
+4. **Rekam Medis**: Dokter dapat membuat dan mengupdate rekam medis
+5. **Resep Obat**: Sistem terintegrasi untuk manajemen resep
+6. **Feedback**: Pasien dapat memberikan feedback setelah konsultasi
+
+## 🗄️ Struktur Database
+
+Sistem menggunakan beberapa tabel utama:
+- `users`: Data pengguna dengan role (admin, dokter, pasien)
+- `polis`: Data poli/departemen
+- `appointments`: Data janji temu
+- `medical_records`: Rekam medis pasien
+- `medicines`: Data obat
+- `prescriptions`: Data resep
+- `schedules`: Jadwal dokter
+- `feedbacks`: Feedback dari pasien
+
+## 🔧 Konfigurasi
+
+### Environment Variables
+Pastikan file `.env` memiliki konfigurasi yang benar:
+```env
+APP_NAME="Rumah Sakit"
+APP_ENV=local
+APP_KEY=base64:key
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=rumah_sakit
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+### Permissions
+Pastikan direktori storage memiliki permission yang tepat:
+```bash
+chmod -R 755 storage
+chmod -R 755 bootstrap/cache
+```
+
+## 🧪 Testing
+
+Jalankan test suite:
+```bash
+php artisan test
+```
+
+## 🤝 Kontribusi
+
+1. Fork repository
+2. Buat branch fitur baru (`git checkout -b feature/AmazingFeature`)
+3. Commit perubahan (`git commit -m 'Add some AmazingFeature'`)
+4. Push ke branch (`git push origin feature/AmazingFeature`)
+5. Buat Pull Request
+
+## 📝 Lisensi
+
+Proyek ini menggunakan lisensi MIT. Lihat file `LICENSE` untuk detail lebih lanjut.
+
+## 📞 Dukungan
+
+Untuk pertanyaan atau dukungan, silakan hubungi tim development atau buat issue di repository ini.
+
+## 🔄 Update Log
+
+### Versi 1.0.0
+- Fitur dasar sistem manajemen rumah sakit
+- Manajemen pengguna dengan 3 role
+- Sistem janji temu
+- Rekam medis dan resep obat
+- Dashboard untuk setiap role
+- Sistem feedback
+
+---
+
+**Catatan**: Pastikan semua dependencies terinstall dengan benar sebelum menjalankan aplikasi. Untuk production deployment, pastikan `APP_ENV=production` dan `APP_DEBUG=false`.
