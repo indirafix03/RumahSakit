@@ -442,34 +442,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Doctor Section -->
-    <section class="py-5">
-        <div class="container">
-            <h2 class="section-title">Dokter Spesialis</h2>
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card doctor-card">
-                        <div class="card-body">
-                            <h5 class="doctor-name">Dr. Albert Flores</h5>
-                            <p class="doctor-specialty">Spesialis Dermatologi</p>
-                            <p class="mb-0 text-primary-custom"><small>RSCM Hospital</small></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card doctor-card">
-                        <div class="card-body">
-                            <h5 class="doctor-name">Dr. Sarah Johnson</h5>
-                            <p class="doctor-specialty">Spesialis Kardiologi</p>
-                            <p class="mb-0 text-primary-custom"><small>RSCM Hospital</small></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Features Section -->
     <section class="features-section">
         <div class="container">

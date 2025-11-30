@@ -11,7 +11,7 @@
                             <i class="fas fa-hospital text-white fs-4"></i>
                         </div>
                         <span class="fw-bold fs-4" style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                            {{ config('app.name', 'Laravel') }}
+                            InD
                         </span>
                     </a>
                 </div>
